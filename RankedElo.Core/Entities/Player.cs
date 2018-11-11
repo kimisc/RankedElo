@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace RankedElo.Core.Model
+namespace RankedElo.Core.Entities
 {
-    class Player
+    public class Player
     {
+        public string Name { get; set; }
+        public double Elo { get; set; }
     }
 }

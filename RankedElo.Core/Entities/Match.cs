@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace RankedElo.Core.Model
+namespace RankedElo.Core.Entities
 {
-    class Match
+    public class Match
     {
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public IEnumerable<Team> Teams { get; set; }
     }
 }
