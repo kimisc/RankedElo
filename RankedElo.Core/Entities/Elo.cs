@@ -8,22 +8,39 @@ namespace RankedElo.Core.Entities
     public static class Elo
     {
 
-        public static void CalculateElo(ref List<Player> team1, ref List<Player> team2, bool team1Wins, int k = 30)
+        public static void CalculateElo(ref Team team1, ref Team team2, int k = 30)
         {
-            var team1Elo = team1.Average(x => x.Elo);
-            var team2Elo = team2.Average(x => x.Elo);
+            var team1Elo = team1.Players.Average(x => x.Elo);
+            var team2Elo = team2.Players.Average(x => x.Elo);
 
             var team1Probability = CalculateProbability(team2Elo, team1Elo);
             var team2Probability = CalculateProbability(team1Elo, team2Elo);
 
-            var team1ActualScore = team1Wins ? 1 : 0;
-            var team2ActualScore = team1Wins ? 0 : 1;
+            var team1ActualScore = CalculateActualScore(team1.Score, team2.Score);
+            var team2ActualScore = CalculateActualScore(team2.Score, team1.Score);
 
-            team1.ForEach(player => player.Elo = CalculateEloForPlayer(player.Elo, team1Probability, team1ActualScore, k));
-            team2.ForEach(player => player.Elo = CalculateEloForPlayer(player.Elo, team2Probability, team2ActualScore, k));
+            team1.Players.ToList()
+                .ForEach(player => player.Elo = CalculateEloForPlayer(player.Elo, team1Probability, team1ActualScore, k));
+            team2.Players.ToList()
+                .ForEach(player => player.Elo = CalculateEloForPlayer(player.Elo, team2Probability, team2ActualScore, k));
         }
 
-        private static double CalculateEloForPlayer(double currentElo, double probability, int actualScore, int k)
+        private static double CalculateProbability(double rating1, double rating2)
+        {
+            return 1.0d * 1.0d / (1 + 1.0d * Math.Pow(10, 1.0d * (rating1 - rating2) / 400));
+        }
+
+        private static float CalculateActualScore(int team1Score, int team2Score)
+        {
+            if(team1Score == team2Score)
+            {
+                return 0.5f;
+            }
+
+            return team1Score > team2Score ? 1 : 0;
+        }
+
+        private static double CalculateEloForPlayer(double currentElo, double probability, float actualScore, int k)
         {
             var elo = currentElo + k * (actualScore - probability);
 
@@ -35,9 +52,6 @@ namespace RankedElo.Core.Entities
             return elo;
         }
 
-        private static double CalculateProbability(double rating1, double rating2)
-        {
-            return 1.0d * 1.0d / (1 + 1.0d * Math.Pow(10, 1.0d * (rating1 - rating2) / 400));
-        }
+
     }
 }
