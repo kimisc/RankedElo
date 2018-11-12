@@ -10,11 +10,8 @@ namespace RankedElo.Core.Entities
 
         public static void CalculateElo(ref Team team1, ref Team team2, int k = 30)
         {
-            var team1Elo = team1.Players.Average(x => x.Elo);
-            var team2Elo = team2.Players.Average(x => x.Elo);
-
-            var team1Probability = CalculateProbability(team2Elo, team1Elo);
-            var team2Probability = CalculateProbability(team1Elo, team2Elo);
+            var team1Probability = CalculateProbability(team2.Elo, team1.Elo);
+            var team2Probability = CalculateProbability(team1.Elo, team2.Elo);
 
             var team1ActualScore = CalculateActualScore(team1.Score, team2.Score);
             var team2ActualScore = CalculateActualScore(team2.Score, team1.Score);
@@ -51,7 +48,5 @@ namespace RankedElo.Core.Entities
 
             return elo;
         }
-
-
     }
 }
