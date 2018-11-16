@@ -9,7 +9,7 @@ pipeline {
 
 		stage('Build') {
 			steps {
-				sh 'dotnet build'
+				sh 'dotnet clean'
 				sh 'dotnet restore'
 				sh 'dotnet build -c Release'
 			}
