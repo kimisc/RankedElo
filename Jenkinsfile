@@ -10,14 +10,13 @@ pipeline {
 		stage('Build') {
 			steps {
 				sh 'dotnet clean'
-				sh 'dotnet restore'
 				sh 'dotnet build -c Release'
 			}
 		}
 
 		stage('Unit Test') {
 			steps {
-				sh 'dotnet test --no-build'
+				sh 'dotnet test'
 			}
 		}
 	}
