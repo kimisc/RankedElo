@@ -31,6 +31,7 @@ namespace RankedElo.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IMatchService, MatchService>();
+            services.AddScoped<IPlayerService, PlayerService>();
 
             string dbName = Guid.NewGuid().ToString();
             services.AddDbContext<RankedEloDbContext>(options =>
