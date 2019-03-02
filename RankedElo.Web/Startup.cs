@@ -15,6 +15,7 @@ using Microsoft.Extensions.Options;
 using RankedElo.Core.Interfaces;
 using RankedElo.Persistence.Contexts;
 using RankedElo.Persistence.Services;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace RankedElo.Web
 {
@@ -36,6 +37,11 @@ namespace RankedElo.Web
                 options.UseInMemoryDatabase(dbName));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "FoosballApi", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,6 +58,12 @@ namespace RankedElo.Web
             }
 
             app.UseHttpsRedirection();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "FoosballApi V1");
+            });
             app.UseMvc();
         }
     }
