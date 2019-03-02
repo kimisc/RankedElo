@@ -43,15 +43,8 @@ namespace RankedElo.Persistence.Services
 
         public async Task<Match> AddMatchAsync(Match match)
         {
-            var team1 = match.Team1;
-            var team2 = match.Team2;
-
-            // Add new or track existing players
-            var existingTeam1Players = await _playerService.GetExistingPlayersAsync(team1.Players);
-            var existingTeam2Players = await _playerService.GetExistingPlayersAsync(team2.Players);
-
-            team1.Players = existingTeam1Players.Any() ? existingTeam1Players : team1.Players;
-            team2.Players = existingTeam2Players.Any() ? existingTeam2Players : team2.Players;
+            var team1 = await GetExistingPlayersIfFound(match.Team1);
+            var team2 = await GetExistingPlayersIfFound(match.Team2);
 
             Elo.CalculateElo(ref team1, ref team2);
 
@@ -62,6 +55,18 @@ namespace RankedElo.Persistence.Services
             await _context.SaveChangesAsync();
 
             return match;
+        }
+
+        private async Task<Team> GetExistingPlayersIfFound(Team team)
+        {
+            for (var i = 0; i < team.Players.Count; i++)
+            {
+                var currentPlayer = team.Players[i];
+                currentPlayer = await _playerService.GetPlayerByNameAsync(currentPlayer.Name) ?? currentPlayer;
+                team.Players[i] = currentPlayer;
+            }
+
+            return team;
         }
     }
 }

@@ -8,9 +8,8 @@ namespace RankedElo.Core.Interfaces
 {
     public interface IPlayerService
     {
-        Task<Player> GetPlayerByNameAync(string name);
+        Task<Player> GetPlayerByNameAsync(string name);
         Task<IEnumerable<Player>> GetAllPlayersAsync();
         Task<IEnumerable<Player>> GetTopTenAsync();
-        Task<IList<Player>> GetExistingPlayersAsync(IEnumerable<Player> players);
     }
 }

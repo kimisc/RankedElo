@@ -28,7 +28,7 @@ namespace RankedElo.Web.Controllers
         [HttpGet("{name}")]
         public async Task<IActionResult> GetByName(string name)
         {
-            return Ok(await _playerService.GetPlayerByNameAync(name));
+            return Ok(await _playerService.GetPlayerByNameAsync(name));
         }
 
         [HttpGet("topten")]

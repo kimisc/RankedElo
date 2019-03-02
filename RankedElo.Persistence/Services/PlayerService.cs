@@ -24,7 +24,7 @@ namespace RankedElo.Persistence.Services
             return await _context.Players.ToListAsync();
         }
 
-        public async Task<Player> GetPlayerByNameAync(string name)
+        public async Task<Player> GetPlayerByNameAsync(string name)
         {
             return await _context.Players.FirstOrDefaultAsync(x => x.Name == name);
         }
@@ -35,12 +35,6 @@ namespace RankedElo.Persistence.Services
                 .OrderByDescending(x => x.Elo)
                 .Take(10)
                 .ToListAsync();
-        }
-
-        public async Task<IList<Player>> GetExistingPlayersAsync(IEnumerable<Player> players)
-        {
-            var names = players.Select(x => x.Name);
-            return await _context.Players.Where(x => names.Contains(x.Name)).ToListAsync();
         }
     }
 }
