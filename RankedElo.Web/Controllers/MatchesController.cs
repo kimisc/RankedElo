@@ -12,30 +12,29 @@ namespace RankedElo.Web.Controllers
     [ApiController]
     public class MatchesController : ControllerBase
     {
-        private readonly IRepository _matchRepository;
+        private readonly IMatchService _matchService;
 
-        public MatchesController(IRepository repository)
+        public MatchesController(IMatchService matchService)
         {
-            _matchRepository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _matchService = matchService ?? throw new ArgumentNullException(nameof(matchService));
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll(int id)
+        [HttpGet("latest/{count}")]
+        public async Task<IActionResult> GetLatest(int count)
         {
-            return Ok(await _matchRepository.List<Match>());
+            return Ok(await _matchService.GetLatestMatchesAsync(count));
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMatch(int id)
         {
-            return Ok(await _matchRepository.GetById<Match>(id));
+            return Ok(await _matchService.GetMatchByIdAsync(id));
         }
 
         [HttpPost]
         public async Task<IActionResult> AddMatch(Match match)
         {
-            await _matchRepository.Add(match);
-            return Ok();
+            return Ok(await _matchService.AddMatchAsync(match));
         }
 
     }

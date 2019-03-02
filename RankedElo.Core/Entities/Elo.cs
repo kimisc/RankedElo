@@ -7,6 +7,12 @@ namespace RankedElo.Core.Entities
 {
     public static class Elo
     {
+        public static void CalculateElo(ref Match match)
+        {
+            var team1 = match.Teams.First();
+            var team2 = match.Teams.Last();
+            CalculateElo(ref team1, ref team2);
+        }
 
         public static void CalculateElo(ref Team team1, ref Team team2, int k = 30)
         {

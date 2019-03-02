@@ -8,7 +8,7 @@ namespace RankedElo.Core.Entities
     public class Team : BaseEntity
     {
         public int Score { get; set; }
-        public IList<Player> Players { get; set; }
+        public virtual IList<Player> Players { get; set; }
         public double Elo => Players.Average(x => x.Elo);
     }
 }

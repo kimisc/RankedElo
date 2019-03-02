@@ -12,5 +12,8 @@ namespace RankedElo.Persistence.Contexts
         public RankedEloDbContext(DbContextOptions<RankedEloDbContext> options): base(options) { }
 
         public DbSet<Match> Matches { get; set; }
+        public DbSet<Team> Teams { get; set; }
+        public DbSet<Player> Players { get; set; }
+
     }
 }

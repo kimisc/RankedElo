@@ -30,7 +30,7 @@ namespace RankedElo.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<IRepository, MatchRepository>();
+            services.AddScoped<IMatchService, MatchService>();
 
             string dbName = Guid.NewGuid().ToString();
             services.AddDbContext<RankedEloDbContext>(options =>

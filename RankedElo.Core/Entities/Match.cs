@@ -8,6 +8,6 @@ namespace RankedElo.Core.Entities
     {
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
-        public IEnumerable<Team> Teams { get; set; }
+        public virtual IEnumerable<Team> Teams { get; set; }
     }
 }
