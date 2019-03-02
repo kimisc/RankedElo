@@ -11,5 +11,6 @@ namespace RankedElo.Core.Interfaces
         Task<Player> GetPlayerByNameAync(string name);
         Task<IEnumerable<Player>> GetAllPlayersAsync();
         Task<IEnumerable<Player>> GetTopTenAsync();
+        Task<IList<Player>> GetExistingPlayersAsync(IEnumerable<Player> players);
     }
 }

@@ -36,5 +36,11 @@ namespace RankedElo.Persistence.Services
                 .Take(10)
                 .ToListAsync();
         }
+
+        public async Task<IList<Player>> GetExistingPlayersAsync(IEnumerable<Player> players)
+        {
+            var names = players.Select(x => x.Name);
+            return await _context.Players.Where(x => names.Contains(x.Name)).ToListAsync();
+        }
     }
 }
