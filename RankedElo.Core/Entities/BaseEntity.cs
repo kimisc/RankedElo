@@ -4,9 +4,8 @@ using System.Text;
 
 namespace RankedElo.Core.Entities
 {
-    public class Player : BaseEntity
+    public abstract class BaseEntity
     {
-        public string Name { get; set; }
-        public double Elo { get; set; }
+        public int Id { get; set; }
     }
 }
