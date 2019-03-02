@@ -28,7 +28,14 @@ namespace RankedElo.Web.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMatch(int id)
         {
-            return Ok(await _matchService.GetMatchByIdAsync(id));
+            var match = await _matchService.GetMatchByIdAsync(id);
+
+            if(match is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(match);
         }
 
         [HttpPost]
