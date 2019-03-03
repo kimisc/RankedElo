@@ -18,55 +18,119 @@ namespace RankedElo.Persistence.Services
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _playerService = playerService ?? throw new ArgumentNullException(nameof(playerService));
-
         }
 
-        public async Task<Match> GetMatchByIdAsync(int id)
+        public async Task<SoloTeamMatch> AddMatchAsync(SoloTeamMatch match)
         {
-            return await _context.Matches
-                .Include(x => x.Team1)
-                .Include(x => x.Team2)
-                .ThenInclude(y => y.Players)
-                .FirstOrDefaultAsync(x => x.Id == id);
-        }
+            var team1 = await GetExistingPlayersIfFound(match.Team1Players);
+            var team2 = await GetExistingPlayersIfFound(match.Team2Players);
 
-        public async Task<IEnumerable<Match>> GetLatestMatchesAsync(int count)
-        {
-            return await _context.Matches
-                .Include(x => x.Team1)
-                .Include(x => x.Team2)
-                .ThenInclude(y => y.Players)
-                .OrderByDescending(x => x.EndTime)
-                .Take(count)
-                .ToListAsync();
-        }
+            Elo.CalculateElo(ref match);
 
-        public async Task<Match> AddMatchAsync(Match match)
-        {
-            var team1 = await GetExistingPlayersIfFound(match.Team1);
-            var team2 = await GetExistingPlayersIfFound(match.Team2);
+            match.Team1Players = team1;
+            match.Team2Players = team2;
 
-            Elo.CalculateElo(ref team1, ref team2);
+            foreach (var player in match.Team1Players)
+            {
+                await AddEloHistoryForPlayers(player);
+                await _context.AddAsync(new PlayerSoloTeamMatches
+                {
+                    Player = player,
+                    SoloTeamMatch = match
+                });
+            }
 
-            match.Team1 = team1;
-            match.Team2 = team2;
+            foreach (var player in match.Team2Players)
+            {
+                await AddEloHistoryForPlayers(player);
+                await _context.AddAsync(new PlayerSoloTeamMatches
+                {
+                    Player = player,
+                    SoloTeamMatch = match
+                });
+            }
 
-            await _context.Matches.AddAsync(match);
+            await _context.SoloTeamMatches.AddAsync(match);
             await _context.SaveChangesAsync();
 
             return match;
         }
 
-        private async Task<Team> GetExistingPlayersIfFound(Team team)
+        public async Task<TeamMatch> AddMatchAsync(TeamMatch match)
         {
-            for (var i = 0; i < team.Players.Count; i++)
+            match.Team1 = _context.Teams.FirstOrDefault(x => x.Name == match.Team1.Name) ?? match.Team1;
+            match.Team2 = _context.Teams.FirstOrDefault(x => x.Name == match.Team2.Name) ?? match.Team2;
+
+            var castedMatch = (IEloCalculable)match;
+            Elo.CalculateElo(ref castedMatch);
+            match = (TeamMatch)castedMatch;
+
+            await AddEloHistoryForTeam(match.Team1, match.Team2);
+
+            await _context.AddAsync(match);
+            await _context.SaveChangesAsync();
+
+            return match;
+        }
+
+        public async Task<TwoPlayerMatch> AddMatchAsync(TwoPlayerMatch match)
+        {
+            match.Player1 = await _playerService.GetPlayerByNameAsync(match.Player1.Name) ?? match.Player1;
+            match.Player2 = await _playerService.GetPlayerByNameAsync(match.Player2.Name) ?? match.Player2;
+
+            var castedMatch = (IEloCalculable)match;
+            Elo.CalculateElo(ref castedMatch);
+            match = (TwoPlayerMatch)castedMatch;
+
+            await _context.AddAsync(match);
+            await AddEloHistoryForPlayers(match.Player1, match.Player2);
+            await _context.SaveChangesAsync();
+
+            return match;
+        }
+
+        private async Task<IList<Player>> GetExistingPlayersIfFound(IList<Player> players)
+        {
+            for (var i = 0; i < players.Count; i++)
             {
-                var currentPlayer = team.Players[i];
+                var currentPlayer = players[i];
                 currentPlayer = await _playerService.GetPlayerByNameAsync(currentPlayer.Name) ?? currentPlayer;
-                team.Players[i] = currentPlayer;
+                players[i] = currentPlayer;
             }
 
-            return team;
+            return players;
+        }
+
+        private async Task AddEloHistoryForTeam(params Team[] teams)
+        {
+            foreach (var team in teams)
+            {
+                if (team.Id != 0)
+                {
+                    await _context.EloHistory.AddAsync(new Elo
+                    {
+                        TeamId = team.Id,
+                        Points = team.CurrentElo,
+                        Timestamp = DateTime.UtcNow
+                    });
+                }
+            }
+        }
+
+        private async Task AddEloHistoryForPlayers(params Player[] players)
+        {
+            foreach (var player in players)
+            {
+                if (player.Id != 0)
+                {
+                    await _context.EloHistory.AddAsync(new Elo
+                    {
+                        PlayerId = player.Id,
+                        Points = player.CurrentElo,
+                        Timestamp = DateTime.UtcNow
+                    });
+                }
+            }
         }
     }
 }

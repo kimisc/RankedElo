@@ -19,27 +19,20 @@ namespace RankedElo.Web.Controllers
             _matchService = matchService ?? throw new ArgumentNullException(nameof(matchService));
         }
 
-        [HttpGet("latest/{count}")]
-        public async Task<IActionResult> GetLatest(int count)
+        [HttpPost("team")]
+        public async Task<IActionResult> AddMatch(TeamMatch match)
         {
-            return Ok(await _matchService.GetLatestMatchesAsync(count));
+            return Ok(await _matchService.AddMatchAsync(match));
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetMatch(int id)
+        [HttpPost("soloteam")]
+        public async Task<IActionResult> AddMatch(SoloTeamMatch match)
         {
-            var match = await _matchService.GetMatchByIdAsync(id);
-
-            if(match is null)
-            {
-                return NotFound();
-            }
-
-            return Ok(match);
+            return Ok(await _matchService.AddMatchAsync(match));
         }
 
-        [HttpPost]
-        public async Task<IActionResult> AddMatch(Match match)
+        [HttpPost("twoplayer")]
+        public async Task<IActionResult> AddMatch(TwoPlayerMatch match)
         {
             return Ok(await _matchService.AddMatchAsync(match));
         }
