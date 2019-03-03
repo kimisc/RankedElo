@@ -35,7 +35,7 @@ namespace RankedElo.Web
 
             string dbName = Guid.NewGuid().ToString();
             services.AddDbContext<RankedEloDbContext>(options =>
-                options.UseInMemoryDatabase(dbName));
+                options.UseSqlServer(@"Server = .\SQLEXPRESS; Database = RankedFoosball; Trusted_Connection = True; ConnectRetryCount = 0"));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
