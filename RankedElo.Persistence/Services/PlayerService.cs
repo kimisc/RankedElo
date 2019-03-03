@@ -32,7 +32,7 @@ namespace RankedElo.Persistence.Services
         public async Task<IEnumerable<Player>> GetTopTenAsync()
         {
             return await _context.Players
-                .OrderByDescending(x => x.Elo)
+                .OrderByDescending(x => x.CurrentElo)
                 .Take(10)
                 .ToListAsync();
         }

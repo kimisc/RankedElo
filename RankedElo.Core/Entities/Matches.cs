@@ -16,27 +16,17 @@ namespace RankedElo.Core.Entities
 
     public class TeamMatch : MatchBase, IEloCalculable
     {
-        public RankedTeam Team1 { get; set; }
-        public RankedTeam Team2 { get; set; }
+        public Team Team1 { get; set; }
+        public Team Team2 { get; set; }
         public double Team1Elo
         {
             get => Team1.CurrentElo;
-            set => Team1.EloHistory.Add(new Elo
-            {
-                Team = Team1,
-                Points = value,
-                Timestamp = DateTime.UtcNow
-            });
+            set => Team1.CurrentElo = value;
         }
         public double Team2Elo
         {
             get => Team2.CurrentElo;
-            set => Team2.EloHistory.Add(new Elo
-            {
-                Team = Team2,
-                Points = value,
-                Timestamp = DateTime.UtcNow
-            });
+            set => Team2.CurrentElo = value;
         }
     }
 
@@ -47,22 +37,12 @@ namespace RankedElo.Core.Entities
         public double Team1Elo
         {
             get => Player1.CurrentElo;
-            set => Player1.EloHistory.Add(new Elo
-            {
-                Player = Player1,
-                Points = value,
-                Timestamp = DateTime.UtcNow
-            });
+            set => Player1.CurrentElo = value;
         }
         public double Team2Elo
         {
             get => Player2.CurrentElo;
-            set => Player2.EloHistory.Add(new Elo
-            {
-                Player = Player2,
-                Points = value,
-                Timestamp = DateTime.UtcNow
-            });
+            set => Player2.CurrentElo = value;
         }
     }
 

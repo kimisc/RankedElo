@@ -88,24 +88,12 @@ namespace RankedElo.Core.Tests
             match.Team1Players.Add(new Player
             {
                 Name = "Player 3",
-                EloHistory = new List<Elo> {
-                    new Elo
-                    {
-                        Points = 900,
-                        Timestamp = DateTime.UtcNow
-                    }
-                }
+                CurrentElo = 900
             });
             match.Team2Players.Add(new Player
             {
                 Name = "Player 4",
-                EloHistory = new List<Elo> {
-                    new Elo
-                    {
-                        Points = 1200,
-                        Timestamp = DateTime.UtcNow
-                    }
-                }
+                CurrentElo = 1200
             });
             match.Team1Score = 1;
             match.Team2Score = 0;
@@ -135,24 +123,12 @@ namespace RankedElo.Core.Tests
             match.Team1Players.Add(new Player
             {
                 Name = "Player 3",
-                EloHistory = new List<Elo> {
-                    new Elo
-                    {
-                        Points = 900,
-                        Timestamp = DateTime.UtcNow
-                    }
-                }
+                CurrentElo = 900
             });
             match.Team2Players.Add(new Player
             {
                 Name = "Player 4",
-                EloHistory = new List<Elo> {
-                    new Elo
-                    {
-                        Points = 1200,
-                        Timestamp = DateTime.UtcNow
-                    }
-                }
+                CurrentElo = 1200
             });
             match.Team1Score = 0;
             match.Team2Score = 1;
@@ -230,26 +206,12 @@ namespace RankedElo.Core.Tests
                 Player1 = new Player()
                 {
                     Name = "Player 1",
-                    EloHistory = new List<Elo>()
-                        {
-                            new Elo()
-                            {
-                                Points = player1Elo,
-                                Timestamp = DateTime.UtcNow
-                            }
-                        }
+                    CurrentElo = player1Elo
                 },
                 Player2 = new Player()
                 {
                     Name = "Player 2",
-                    EloHistory = new List<Elo>()
-                        {
-                            new Elo()
-                            {
-                                Points = player2Elo,
-                                Timestamp = DateTime.UtcNow
-                            }
-                        }
+                    CurrentElo = player2Elo
                 }
             };
         }
@@ -258,29 +220,15 @@ namespace RankedElo.Core.Tests
         {
             return new TeamMatch
             {
-                Team1 = new RankedTeam
+                Team1 = new Team
                 {
                     Name = "Team 1",
-                    EloHistory = new List<Elo>
-                    {
-                        new Elo
-                        {
-                            Points = team1Elo,
-                            Timestamp = DateTime.UtcNow
-                        }
-                    }
+                    CurrentElo = team1Elo
                 },
-                Team2 = new RankedTeam
+                Team2 = new Team
                 {
                     Name = "Team 2",
-                    EloHistory = new List<Elo>
-                    {
-                        new Elo
-                        {
-                            Points = team2Elo,
-                            Timestamp = DateTime.UtcNow
-                        }
-                    }
+                    CurrentElo = team2Elo
                 }
             };
         }
@@ -294,14 +242,7 @@ namespace RankedElo.Core.Tests
                     new Player
                     {
                         Name = "Player 1",
-                        EloHistory = new List<Elo>()
-                        {
-                            new Elo()
-                            {
-                                Points = player1Elo,
-                                Timestamp = DateTime.UtcNow
-                            }
-                        }
+                        CurrentElo = player1Elo
                     }
                 },
                 Team2Players = new List<Player>
@@ -309,18 +250,10 @@ namespace RankedElo.Core.Tests
                     new Player
                     {
                         Name = "Player 2",
-                        EloHistory = new List<Elo>()
-                        {
-                            new Elo()
-                            {
-                                Points = player2Elo,
-                                Timestamp = DateTime.UtcNow
-                            }
-                        }
+                        CurrentElo = player2Elo
                     }
                 },
             };
         }
-
     }
 }

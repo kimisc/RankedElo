@@ -18,8 +18,8 @@ namespace RankedElo.Core.Entities
         public int Id { get; set; }
         public DateTime Timestamp { get; set; }
         public double Points { get; set; } = 1000d;
-        public Player Player { get; set; }
-        public RankedTeam Team { get; set; }
+        public int? PlayerId { get; set; }
+        public int? TeamId { get; set; }
 
 
         public static void CalculateElo(ref IEloCalculable match, int k = 30)
