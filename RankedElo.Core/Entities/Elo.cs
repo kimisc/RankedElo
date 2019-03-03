@@ -5,20 +5,47 @@ using System.Text;
 
 namespace RankedElo.Core.Entities
 {
-    public static class Elo
+    public interface IEloCalculable
     {
-        public static void CalculateElo(ref Team team1, ref Team team2, int k = 30)
+        double Team1Elo { get; set; }
+        double Team2Elo { get; set; }
+        int Team1Score { get; set; }
+        int Team2Score { get; set; }
+    }
+
+    public class Elo
+    {
+        public int Id { get; set; }
+        public DateTime Timestamp { get; set; }
+        public double Points { get; set; } = 1000d;
+        public Player Player { get; set; }
+        public RankedTeam Team { get; set; }
+
+
+        public static void CalculateElo(ref IEloCalculable match, int k = 30)
         {
-            var team1Probability = CalculateProbability(team2.Elo, team1.Elo);
-            var team2Probability = CalculateProbability(team1.Elo, team2.Elo);
+            var team1Probability = CalculateProbability(match.Team2Elo, match.Team1Elo);
+            var team2Probability = CalculateProbability(match.Team1Elo, match.Team2Elo);
 
-            var team1ActualScore = CalculateActualScore(team1.Score, team2.Score);
-            var team2ActualScore = CalculateActualScore(team2.Score, team1.Score);
+            var team1ActualScore = CalculateActualScore(match.Team1Score, match.Team2Score);
+            var team2ActualScore = CalculateActualScore(match.Team2Score, match.Team1Score);
 
-            team1.Players.ToList()
-                .ForEach(player => player.Elo = CalculateEloForPlayer(player.Elo, team1Probability, team1ActualScore, k));
-            team2.Players.ToList()
-                .ForEach(player => player.Elo = CalculateEloForPlayer(player.Elo, team2Probability, team2ActualScore, k));
+            match.Team1Elo = CalculateEloForPlayer(match.Team1Elo, team1Probability, team1ActualScore, k);
+            match.Team2Elo = CalculateEloForPlayer(match.Team2Elo, team2Probability, team2ActualScore, k);
+        }
+
+        public static void CalculateElo(ref SoloTeamMatch match, int k = 30)
+        {
+            var team1Probability = CalculateProbability(match.Team2Elo, match.Team1Elo);
+            var team2Probability = CalculateProbability(match.Team1Elo, match.Team2Elo);
+
+            var team1ActualScore = CalculateActualScore(match.Team1Score, match.Team2Score);
+            var team2ActualScore = CalculateActualScore(match.Team2Score, match.Team1Score);
+
+            match.Team1Players.ToList()
+                .ForEach(player => player.CurrentElo = CalculateEloForPlayer(player.CurrentElo, team1Probability, team1ActualScore, k));
+            match.Team2Players.ToList()
+                .ForEach(player => player.CurrentElo = CalculateEloForPlayer(player.CurrentElo, team2Probability, team2ActualScore, k));
         }
 
         private static double CalculateProbability(double rating1, double rating2)

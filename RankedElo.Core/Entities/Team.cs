@@ -5,10 +5,31 @@ using System.Text;
 
 namespace RankedElo.Core.Entities
 {
-    public class Team : BaseEntity
+    public class MixedTeam : BaseEntity
     {
-        public int Score { get; set; }
         public IList<Player> Players { get; set; }
-        public double Elo => Players.Average(x => x.Elo);
+        public double Elo => Players.Average(x => x.CurrentElo);
+    }
+
+    public class RankedTeam : BaseEntity
+    {
+        public string Name { get; set; }
+        public IList<Elo> EloHistory { get; set; }
+        public double CurrentElo
+        {
+            get
+            {
+                return EloHistory.OrderBy(x => x.Timestamp).LastOrDefault()?.Points ?? 1000d;
+            }
+            set
+            {
+                EloHistory.Add(new Elo
+                {
+                    Points = value,
+                    Timestamp = DateTime.UtcNow
+                });
+            }
+        }
+
     }
 }

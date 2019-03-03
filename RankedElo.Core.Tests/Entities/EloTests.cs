@@ -8,157 +8,317 @@ namespace RankedElo.Core.Tests
 {
     public class EloTests
     {
-        private Team _team1;
-        private Team _team2;
-
 
         [Fact]
-        public void CalculateElo_TwoPlayersTeam1Wins_PlayerEloUsed()
+        public void CalculateElo_TwoPlayersTeam1Wins_EloUpdated()
         {
-            InitDefaultTeams(1200, 1000);
-            _team1.Score = 1;
-            _team2.Score = 0;
+            IEloCalculable match = CreateTwoPlayerMatch(1200, 1000);
+            match.Team1Score = 1;
+            match.Team2Score = 0;
 
-            Elo.CalculateElo(ref _team1, ref _team2);
-            var player1 = _team1.Players.First();
-            var player2 = _team2.Players.First();
+            Elo.CalculateElo(ref match);
+
+            var player1 = (match as TwoPlayerMatch).Player1;
+            var player2 = (match as TwoPlayerMatch).Player2;
 
             Assert.Equal("Player 1", player1.Name);
-            Assert.Equal(1207.2, player1.Elo, 1);
+            Assert.Equal(1207.2, player1.CurrentElo, 1);
             Assert.Equal("Player 2", player2.Name);
-            Assert.Equal(992.8, player2.Elo, 1);
+            Assert.Equal(992.8, player2.CurrentElo, 1);
         }
 
         [Fact]
-        public void CalculateElo_TwoPlayersTeam2Wins_PlayerEloUsed()
+        public void CalculateElo_TwoPlayersTeam2Wins_EloUpdated()
         {
-            InitDefaultTeams(1200, 1000);
-            _team1.Score = 0;
-            _team2.Score = 1;
+            IEloCalculable match = CreateTwoPlayerMatch(1200, 1000);
+            match.Team1Score = 0;
+            match.Team2Score = 1;
 
-            Elo.CalculateElo(ref _team1, ref _team2);
-            var player1 = _team1.Players.First();
-            var player2 = _team2.Players.First();
+            Elo.CalculateElo(ref match);
+
+            var player1 = (match as TwoPlayerMatch).Player1;
+            var player2 = (match as TwoPlayerMatch).Player2;
 
             Assert.Equal("Player 1", player1.Name);
-            Assert.Equal(1177.2, player1.Elo, 1);
+            Assert.Equal(1177.2, player1.CurrentElo, 1);
             Assert.Equal("Player 2", player2.Name);
-            Assert.Equal(1022.8, player2.Elo, 1);
+            Assert.Equal(1022.8, player2.CurrentElo, 1);
+        }
+
+        [Fact]
+        public void CalculateElo_RankedTeamTeam1Wins_EloUpdated()
+        {
+            IEloCalculable match = CreateTeamMatch(1200, 1000);
+            match.Team1Score = 1;
+            match.Team2Score = 0;
+
+            Elo.CalculateElo(ref match);
+
+            var team1 = (match as TeamMatch).Team1;
+            var team2 = (match as TeamMatch).Team2;
+
+            Assert.Equal("Team 1", team1.Name);
+            Assert.Equal(1207.2, team1.CurrentElo, 1);
+            Assert.Equal("Team 2", team2.Name);
+            Assert.Equal(992.8, team2.CurrentElo, 1);
+        }
+
+        [Fact]
+        public void CalculateElo_RankedTeamTeam2Wins_EloUpdated()
+        {
+            IEloCalculable match = CreateTeamMatch(1200, 1000);
+            match.Team1Score = 0;
+            match.Team2Score = 1;
+
+            Elo.CalculateElo(ref match);
+
+            var team1 = (match as TeamMatch).Team1;
+            var team2 = (match as TeamMatch).Team2;
+
+            Assert.Equal("Team 1", team1.Name);
+            Assert.Equal(1177.2, team1.CurrentElo, 1);
+            Assert.Equal("Team 2", team2.Name);
+            Assert.Equal(1022.8, team2.CurrentElo, 1);
         }
 
         [Fact]
         public void CalculateElo_MultiplePlayersTeam1Wins_TeamAverageUsed()
         {
-            InitDefaultTeams();
-            _team1.Players.Add(new Player() { Name = "Player 3", Elo = 900 });
-            _team2.Players.Add(new Player() { Name = "Player 4", Elo = 1200 });
-            _team1.Score = 1;
-            _team2.Score = 0;
+            var match = CreateSoloTeamMatch(1000, 1000);
+            match.Team1Players.Add(new Player
+            {
+                Name = "Player 3",
+                EloHistory = new List<Elo> {
+                    new Elo
+                    {
+                        Points = 900,
+                        Timestamp = DateTime.UtcNow
+                    }
+                }
+            });
+            match.Team2Players.Add(new Player
+            {
+                Name = "Player 4",
+                EloHistory = new List<Elo> {
+                    new Elo
+                    {
+                        Points = 1200,
+                        Timestamp = DateTime.UtcNow
+                    }
+                }
+            });
+            match.Team1Score = 1;
+            match.Team2Score = 0;
 
-            Elo.CalculateElo(ref _team1, ref _team2);
-            var t1_player1 = _team1.Players.First();
-            var t1_player2 = _team1.Players.Last();
-            var t2_player1 = _team2.Players.First();
-            var t2_player2 = _team2.Players.Last();
+
+            Elo.CalculateElo(ref match);
+
+            var t1_player1 = match.Team1Players.First();
+            var t1_player2 = match.Team1Players.Last();
+            var t2_player1 = match.Team2Players.First();
+            var t2_player2 = match.Team2Players.Last();
 
             Assert.Equal("Player 1", t1_player1.Name);
-            Assert.Equal(1021.1, t1_player1.Elo, 1);
+            Assert.Equal(1021.1, t1_player1.CurrentElo, 1);
             Assert.Equal("Player 3", t1_player2.Name);
-            Assert.Equal(921.1, t1_player2.Elo, 1);
+            Assert.Equal(921.1, t1_player2.CurrentElo, 1);
             Assert.Equal("Player 2", t2_player1.Name);
-            Assert.Equal(978.9, t2_player1.Elo, 1);
+            Assert.Equal(978.9, t2_player1.CurrentElo, 1);
             Assert.Equal("Player 4", t2_player2.Name);
-            Assert.Equal(1178.9, t2_player2.Elo, 1);
+            Assert.Equal(1178.9, t2_player2.CurrentElo, 1);
         }
 
         [Fact]
         public void CalculateElo_MultiplePlayersTeam2Wins_TeamAverageUsed()
         {
-            InitDefaultTeams();
-            _team1.Players.Add(new Player() { Name = "Player 3", Elo = 900 });
-            _team2.Players.Add(new Player() { Name = "Player 4", Elo = 1200 });
-            _team1.Score = 0;
-            _team2.Score = 1;
+            var match = CreateSoloTeamMatch(1000, 1000);
+            match.Team1Players.Add(new Player
+            {
+                Name = "Player 3",
+                EloHistory = new List<Elo> {
+                    new Elo
+                    {
+                        Points = 900,
+                        Timestamp = DateTime.UtcNow
+                    }
+                }
+            });
+            match.Team2Players.Add(new Player
+            {
+                Name = "Player 4",
+                EloHistory = new List<Elo> {
+                    new Elo
+                    {
+                        Points = 1200,
+                        Timestamp = DateTime.UtcNow
+                    }
+                }
+            });
+            match.Team1Score = 0;
+            match.Team2Score = 1;
 
-            Elo.CalculateElo(ref _team1, ref _team2);
-            var t1_player1 = _team1.Players.First();
-            var t1_player2 = _team1.Players.Last();
-            var t2_player1 = _team2.Players.First();
-            var t2_player2 = _team2.Players.Last();
+
+            Elo.CalculateElo(ref match);
+
+            var t1_player1 = match.Team1Players.First();
+            var t1_player2 = match.Team1Players.Last();
+            var t2_player1 = match.Team2Players.First();
+            var t2_player2 = match.Team2Players.Last();
 
             Assert.Equal("Player 1", t1_player1.Name);
-            Assert.Equal(991.1, t1_player1.Elo, 1);
+            Assert.Equal(991.1, t1_player1.CurrentElo, 1);
             Assert.Equal("Player 3", t1_player2.Name);
-            Assert.Equal(891.1, t1_player2.Elo, 1);
+            Assert.Equal(891.1, t1_player2.CurrentElo, 1);
             Assert.Equal("Player 2", t2_player1.Name);
-            Assert.Equal(1008.9, t2_player1.Elo, 1);
+            Assert.Equal(1008.9, t2_player1.CurrentElo, 1);
             Assert.Equal("Player 4", t2_player2.Name);
-            Assert.Equal(1208.9, t2_player2.Elo, 1);
+            Assert.Equal(1208.9, t2_player2.CurrentElo, 1);
         }
 
         [Fact]
         public void CalculateElo_EloChangeBelowZero_ReturnsZero()
         {
-            InitDefaultTeams(0, 1000);
-            _team1.Score = 0;
-            _team2.Score = 1;
+            IEloCalculable match = CreateTwoPlayerMatch(0, 1000);
+            match.Team1Score = 0;
+            match.Team2Score = 1;
 
-            Elo.CalculateElo(ref _team1, ref _team2);
-            var player1 = _team1.Players.First();
-            var player2 = _team2.Players.First();
+            Elo.CalculateElo(ref match);
+
+            var player1 = (match as TwoPlayerMatch).Player1;
+            var player2 = (match as TwoPlayerMatch).Player2;
 
             Assert.Equal("Player 1", player1.Name);
-            Assert.Equal(0, player1.Elo);
+            Assert.Equal(0, player1.CurrentElo);
         }
 
         [Fact]
         public void CalculateElo_TieGameWithSameElo_EloNotChanged()
         {
-            InitDefaultTeams();
-            Elo.CalculateElo(ref _team1, ref _team2);
-            var player1 = _team1.Players.First();
-            var player2 = _team2.Players.First();
+            IEloCalculable match = CreateTwoPlayerMatch(1000, 1000);
+            match.Team1Score = 0;
+            match.Team2Score = 0;
 
-            Assert.Equal(1000, player1.Elo);
-            Assert.Equal(1000, player2.Elo);
+            Elo.CalculateElo(ref match);
+
+            var player1 = (match as TwoPlayerMatch).Player1;
+            var player2 = (match as TwoPlayerMatch).Player2;
+
+            Assert.Equal(1000, player1.CurrentElo);
+            Assert.Equal(1000, player2.CurrentElo);
         }
 
         [Fact]
         public void CalculateElo_TieGameWithDifferentElo_EloChanged()
         {
-            InitDefaultTeams(1000, 1200);
-            Elo.CalculateElo(ref _team1, ref _team2);
-            var player1 = _team1.Players.First();
-            var player2 = _team2.Players.First();
+            IEloCalculable match = CreateTwoPlayerMatch(1000, 1200);
+            match.Team1Score = 0;
+            match.Team2Score = 0;
 
-            Assert.Equal(1007.8, player1.Elo, 1);
-            Assert.Equal(1192.2, player2.Elo, 1);
+            Elo.CalculateElo(ref match);
+
+            var player1 = (match as TwoPlayerMatch).Player1;
+            var player2 = (match as TwoPlayerMatch).Player2;
+
+            Assert.Equal(1007.8, player1.CurrentElo, 1);
+            Assert.Equal(1192.2, player2.CurrentElo, 1);
         }
 
-        private void InitDefaultTeams(double p1Elo = 1000, double p2Elo = 1000)
+        private TwoPlayerMatch CreateTwoPlayerMatch(double player1Elo = 1000, double player2Elo = 1000)
         {
-            _team1 = new Team()
+            return new TwoPlayerMatch()
             {
-                Players = new List<Player>()
+                Player1 = new Player()
                 {
-                    new Player()
+                    Name = "Player 1",
+                    EloHistory = new List<Elo>()
+                        {
+                            new Elo()
+                            {
+                                Points = player1Elo,
+                                Timestamp = DateTime.UtcNow
+                            }
+                        }
+                },
+                Player2 = new Player()
+                {
+                    Name = "Player 2",
+                    EloHistory = new List<Elo>()
+                        {
+                            new Elo()
+                            {
+                                Points = player2Elo,
+                                Timestamp = DateTime.UtcNow
+                            }
+                        }
+                }
+            };
+        }
+
+        private TeamMatch CreateTeamMatch(double team1Elo = 1000, double team2Elo = 1000)
+        {
+            return new TeamMatch
+            {
+                Team1 = new RankedTeam
+                {
+                    Name = "Team 1",
+                    EloHistory = new List<Elo>
                     {
-                        Name = "Player 1",
-                        Elo = p1Elo
+                        new Elo
+                        {
+                            Points = team1Elo,
+                            Timestamp = DateTime.UtcNow
+                        }
+                    }
+                },
+                Team2 = new RankedTeam
+                {
+                    Name = "Team 2",
+                    EloHistory = new List<Elo>
+                    {
+                        new Elo
+                        {
+                            Points = team2Elo,
+                            Timestamp = DateTime.UtcNow
+                        }
                     }
                 }
             };
+        }
 
-            _team2 = new Team()
+        private SoloTeamMatch CreateSoloTeamMatch(double player1Elo = 1000, double player2Elo = 1000)
+        {
+            return new SoloTeamMatch()
             {
-             Players = new List<Player>()
+                Team1Players = new List<Player>
                 {
-                    new Player()
+                    new Player
+                    {
+                        Name = "Player 1",
+                        EloHistory = new List<Elo>()
+                        {
+                            new Elo()
+                            {
+                                Points = player1Elo,
+                                Timestamp = DateTime.UtcNow
+                            }
+                        }
+                    }
+                },
+                Team2Players = new List<Player>
+                {
+                    new Player
                     {
                         Name = "Player 2",
-                        Elo = p2Elo
+                        EloHistory = new List<Elo>()
+                        {
+                            new Elo()
+                            {
+                                Points = player2Elo,
+                                Timestamp = DateTime.UtcNow
+                            }
+                        }
                     }
-                }
+                },
             };
         }
 
