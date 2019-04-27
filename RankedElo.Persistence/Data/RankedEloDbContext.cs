@@ -20,23 +20,11 @@ namespace RankedElo.Persistence.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Elo>()
-                .HasOne<Player>()
-                .WithMany()
-                .HasForeignKey(x => x.PlayerId);
-
-            modelBuilder.Entity<Elo>()
-                .HasOne<Team>()
-                .WithMany()
-                .HasForeignKey(x => x.TeamId);
-
-            modelBuilder.Entity<TeamMatch>()
-                .Ignore(x => x.Team1Elo)
-                .Ignore(x => x.Team2Elo);
-
-            modelBuilder.Entity<TwoPlayerMatch>()
-                .Ignore(x => x.Team1Elo)
-                .Ignore(x => x.Team2Elo);
+            modelBuilder.Entity<Team>()
+                .Ignore(x => x.CurrentElo);
+                
+            modelBuilder.Entity<Player>()
+                .Ignore(x => x.CurrentElo);
 
             modelBuilder.Entity<SoloTeamMatch>()
                 .Ignore(x => x.Team1Players)

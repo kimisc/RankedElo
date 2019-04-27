@@ -8,6 +8,6 @@ namespace RankedElo.Core.Interfaces
 {
     public interface IMatchService
     {
-        Task AddMatchAsync(IEloCalculable match);                                                                                                                                                                                                                  
+        Task AddMatchAsync(IRankedMatch match);                                                                                                                                                                                                                  
     }
 }

@@ -2,7 +2,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RankedElo.Persistence.Contexts;
@@ -10,22 +9,19 @@ using RankedElo.Persistence.Contexts;
 namespace RankedElo.Persistence.Migrations
 {
     [DbContext(typeof(RankedEloDbContext))]
-    [Migration("20190303194902_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20190427155430_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.2-servicing-10034")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity("RankedElo.Core.Entities.Elo", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<int?>("PlayerId");
 
@@ -47,10 +43,7 @@ namespace RankedElo.Persistence.Migrations
             modelBuilder.Entity("RankedElo.Core.Entities.Player", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<double>("CurrentElo");
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("Name");
 
@@ -75,8 +68,7 @@ namespace RankedElo.Persistence.Migrations
             modelBuilder.Entity("RankedElo.Core.Entities.SoloTeamMatch", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("EndTime");
 
@@ -94,10 +86,7 @@ namespace RankedElo.Persistence.Migrations
             modelBuilder.Entity("RankedElo.Core.Entities.Team", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<double>("CurrentElo");
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("Name");
 
@@ -109,8 +98,7 @@ namespace RankedElo.Persistence.Migrations
             modelBuilder.Entity("RankedElo.Core.Entities.TeamMatch", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("EndTime");
 
@@ -136,8 +124,7 @@ namespace RankedElo.Persistence.Migrations
             modelBuilder.Entity("RankedElo.Core.Entities.TwoPlayerMatch", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("EndTime");
 
@@ -163,11 +150,11 @@ namespace RankedElo.Persistence.Migrations
             modelBuilder.Entity("RankedElo.Core.Entities.Elo", b =>
                 {
                     b.HasOne("RankedElo.Core.Entities.Player")
-                        .WithMany()
+                        .WithMany("EloHistory")
                         .HasForeignKey("PlayerId");
 
                     b.HasOne("RankedElo.Core.Entities.Team")
-                        .WithMany()
+                        .WithMany("EloHistory")
                         .HasForeignKey("TeamId");
                 });
 

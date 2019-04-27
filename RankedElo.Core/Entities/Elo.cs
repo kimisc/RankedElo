@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RankedElo.Core.Entities
 {
-    public interface IEloCalculable
+    public interface IRankedMatch
     {
         void CalculateElo();
     }

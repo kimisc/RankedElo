@@ -14,7 +14,7 @@ namespace RankedElo.Core.Entities
         public int Team2Score { get; set; }
     }
 
-    public class TeamMatch : Match, IEloCalculable
+    public class TeamMatch : Match, IRankedMatch
     {
         public Team Team1 { get; set; }
         public Team Team2 { get; set; }
@@ -32,7 +32,7 @@ namespace RankedElo.Core.Entities
         }
     }
 
-    public class TwoPlayerMatch : Match, IEloCalculable
+    public class TwoPlayerMatch : Match, IRankedMatch
     {
         public Player Player1 { get; set; }
         public Player Player2 { get; set; }
@@ -50,7 +50,7 @@ namespace RankedElo.Core.Entities
         }
     }
 
-    public class SoloTeamMatch : Match, IEloCalculable
+    public class SoloTeamMatch : Match, IRankedMatch
     {
         public IList<Player> Team1Players { get; set; }
         public IList<Player> Team2Players { get; set; }

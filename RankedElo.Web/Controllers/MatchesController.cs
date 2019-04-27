@@ -22,19 +22,22 @@ namespace RankedElo.Web.Controllers
         [HttpPost("team")]
         public async Task<IActionResult> AddMatch(TeamMatch match)
         {
-            return Ok(await _matchService.AddMatchAsync(match));
+            await _matchService.AddMatchAsync(match);
+            return Ok();
         }
 
         [HttpPost("soloteam")]
         public async Task<IActionResult> AddMatch(SoloTeamMatch match)
         {
-            return Ok(await _matchService.AddMatchAsync(match));
+            await _matchService.AddMatchAsync(match);
+            return Ok();
         }
 
         [HttpPost("twoplayer")]
         public async Task<IActionResult> AddMatch(TwoPlayerMatch match)
         {
-            return Ok(await _matchService.AddMatchAsync(match));
+            await _matchService.AddMatchAsync(match);
+            return Ok();
         }
 
     }
