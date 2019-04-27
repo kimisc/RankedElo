@@ -5,11 +5,6 @@ using System.Text;
 
 namespace RankedElo.Core.Entities
 {
-    public interface IRankedMatch
-    {
-        void CalculateElo();
-    }
-
     public class Elo
     {
         public int Id { get; set; }

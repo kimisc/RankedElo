@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RankedElo.Core.Interfaces;
+using RankedElo.Core.Services;
 using RankedElo.Persistence.Contexts;
 using RankedElo.Persistence.Services;
 using Swashbuckle.AspNetCore.Swagger;
@@ -31,7 +32,8 @@ namespace RankedElo.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<IMatchService, DatabaseMatchService>();
+            services.AddScoped<IMatchService, MatchService>();
+            services.AddScoped<IMatchRepository, MatchRepository>();
             services.AddScoped<IPlayerService, PlayerService>();
 
             services.AddDbContext<RankedEloDbContext>(options =>

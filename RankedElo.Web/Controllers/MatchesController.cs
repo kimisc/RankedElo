@@ -13,6 +13,7 @@ namespace RankedElo.Web.Controllers
     public class MatchesController : ControllerBase
     {
         private readonly IMatchService _matchService;
+        private readonly IPlayerService _playerService;
 
         public MatchesController(IMatchService matchService)
         {
@@ -22,22 +23,22 @@ namespace RankedElo.Web.Controllers
         [HttpPost("team")]
         public async Task<IActionResult> AddMatch(TeamMatch match)
         {
-            await _matchService.AddMatchAsync(match);
+            await _matchService.AddMatchAsync<TeamMatch>(match);
             return Ok();
         }
 
         [HttpPost("soloteam")]
         public async Task<IActionResult> AddMatch(SoloTeamMatch match)
         {
-            await _matchService.AddMatchAsync(match);
+            await _matchService.AddMatchAsync<SoloTeamMatch>(match);
             return Ok();
         }
 
         [HttpPost("twoplayer")]
         public async Task<IActionResult> AddMatch(TwoPlayerMatch match)
         {
-            await _matchService.AddMatchAsync(match);
-            return Ok();
+            var result = await _matchService.AddMatchAsync<TwoPlayerMatch>(match);
+            return Ok(result);
         }
 
     }

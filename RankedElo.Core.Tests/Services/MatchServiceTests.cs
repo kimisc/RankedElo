@@ -1,18 +1,28 @@
 using RankedElo.Core.Entities;
+using RankedElo.Core.Services;
+using RankedElo.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
+using NSubstitute;
+using System.Threading.Tasks;
 
 namespace RankedElo.Core.Tests
 {
-    public class MatchesTests
+    public class MatchServiceTests
     {
+        private readonly IMatchService _service;
+        public MatchServiceTests()
+        {
+            var repositoryStub = Substitute.For<IMatchRepository>();
+            _service = new MatchService(repositoryStub);
+        }
 
         [Fact]
-        public void CalculateElo_TwoPlayersTeam1Wins_EloUpdated()
+        public async Task CalculateElo_TwoPlayersTeam1Wins_EloUpdated()
         {
-            var match = new TwoPlayerMatch()
+            IRankedMatch match = new TwoPlayerMatch()
             {
                 Player1 = new Player()
                 {
@@ -28,10 +38,10 @@ namespace RankedElo.Core.Tests
                 Team2Score = 0
             };
 
-            match.CalculateElo();
+            var result = await _service.AddMatchAsync<TwoPlayerMatch>(match);
 
-            var player1 = match.Player1;
-            var player2 = match.Player2;
+            var player1 = result.Player1;
+            var player2 = result.Player2;
 
             Assert.Equal("Player 1", player1.Name);
             Assert.Equal(1207.2, player1.CurrentElo, 1);
@@ -40,9 +50,9 @@ namespace RankedElo.Core.Tests
         }
 
         [Fact]
-        public void CalculateElo_TwoPlayersTeam2Wins_EloUpdated()
+        public async Task CalculateElo_TwoPlayersTeam2Wins_EloUpdated()
         {
-            var match = new TwoPlayerMatch()
+            IRankedMatch match = new TwoPlayerMatch()
             {
                 Player1 = new Player()
                 {
@@ -58,10 +68,10 @@ namespace RankedElo.Core.Tests
                 Team2Score = 1
             };
 
-            match.CalculateElo();
+            var result = await _service.AddMatchAsync<TwoPlayerMatch>(match);
 
-            var player1 = match.Player1;
-            var player2 = match.Player2;
+            var player1 = result.Player1;
+            var player2 = result.Player2;
 
             Assert.Equal("Player 1", player1.Name);
             Assert.Equal(1177.2, player1.CurrentElo, 1);
@@ -70,9 +80,9 @@ namespace RankedElo.Core.Tests
         }
 
         [Fact]
-        public void CalculateElo_RankedTeamTeam1Wins_EloUpdated()
+        public async Task CalculateElo_RankedTeamTeam1Wins_EloUpdated()
         {
-            var match = new TeamMatch
+            IRankedMatch match = new TeamMatch
             {
                 Team1 = new Team
                 {
@@ -87,10 +97,11 @@ namespace RankedElo.Core.Tests
                 Team1Score = 1,
                 Team2Score = 0
             };
-            match.CalculateElo();
 
-            var team1 = match.Team1;
-            var team2 = match.Team2;
+            var result = await _service.AddMatchAsync<TeamMatch>(match);
+
+            var team1 = result.Team1;
+            var team2 = result.Team2;
 
             Assert.Equal("Team 1", team1.Name);
             Assert.Equal(1207.2, team1.CurrentElo, 1);
@@ -99,9 +110,9 @@ namespace RankedElo.Core.Tests
         }
 
         [Fact]
-        public void CalculateElo_RankedTeamTeam2Wins_EloUpdated()
+        public async Task CalculateElo_RankedTeamTeam2Wins_EloUpdated()
         {
-            var match = new TeamMatch
+            IRankedMatch match = new TeamMatch
             {
                 Team1 = new Team
                 {
@@ -116,9 +127,10 @@ namespace RankedElo.Core.Tests
                 Team1Score = 0,
                 Team2Score = 1
             };
-            match.CalculateElo();
-            var team1 = match.Team1;
-            var team2 = match.Team2;
+            var result = await _service.AddMatchAsync<TeamMatch>(match);
+
+            var team1 = result.Team1;
+            var team2 = result.Team2;
 
             Assert.Equal("Team 1", team1.Name);
             Assert.Equal(1177.2, team1.CurrentElo, 1);
@@ -127,11 +139,11 @@ namespace RankedElo.Core.Tests
         }
 
         [Fact]
-        public void CalculateElo_MultiplePlayersTeam1Wins_TeamAverageUsed()
+        public async Task CalculateElo_MultiplePlayersTeam1Wins_TeamAverageUsed()
         {
-            var match = new SoloTeamMatch
+            IRankedMatch match = new SoloTeamMatch
             {
-                Team1Players = new List<Player> 
+                Team1Players = new List<Player>
                 {
                     new Player()
                     {
@@ -142,9 +154,9 @@ namespace RankedElo.Core.Tests
                     {
                         Name = "Player 3",
                         CurrentElo = 900
-                    } 
+                    }
                 },
-                Team2Players = new List<Player> 
+                Team2Players = new List<Player>
                 {
                     new Player()
                     {
@@ -155,18 +167,18 @@ namespace RankedElo.Core.Tests
                     {
                         Name = "Player 4",
                         CurrentElo = 1200
-                    } 
+                    }
                 },
                 Team1Score = 1,
                 Team2Score = 0
             };
 
-            match.CalculateElo();
+            var result = await _service.AddMatchAsync<SoloTeamMatch>(match);
 
-            var t1_player1 = match.Team1Players.First();
-            var t1_player2 = match.Team1Players.Last();
-            var t2_player1 = match.Team2Players.First();
-            var t2_player2 = match.Team2Players.Last();
+            var t1_player1 = result.Team1Players.First();
+            var t1_player2 = result.Team1Players.Last();
+            var t2_player1 = result.Team2Players.First();
+            var t2_player2 = result.Team2Players.Last();
 
             Assert.Equal("Player 1", t1_player1.Name);
             Assert.Equal(1021.1, t1_player1.CurrentElo, 1);
@@ -179,11 +191,11 @@ namespace RankedElo.Core.Tests
         }
 
         [Fact]
-        public void CalculateElo_MultiplePlayersTeam2Wins_TeamAverageUsed()
+        public async Task CalculateElo_MultiplePlayersTeam2Wins_TeamAverageUsed()
         {
-            var match = new SoloTeamMatch
+            IRankedMatch match = new SoloTeamMatch
             {
-                Team1Players = new List<Player> 
+                Team1Players = new List<Player>
                 {
                     new Player()
                     {
@@ -194,9 +206,9 @@ namespace RankedElo.Core.Tests
                     {
                         Name = "Player 3",
                         CurrentElo = 900
-                    } 
+                    }
                 },
-                Team2Players = new List<Player> 
+                Team2Players = new List<Player>
                 {
                     new Player()
                     {
@@ -207,18 +219,18 @@ namespace RankedElo.Core.Tests
                     {
                         Name = "Player 4",
                         CurrentElo = 1200
-                    } 
+                    }
                 },
                 Team1Score = 0,
                 Team2Score = 1
             };
 
-            match.CalculateElo();
+            var result = await _service.AddMatchAsync<SoloTeamMatch>(match);
 
-            var t1_player1 = match.Team1Players.First();
-            var t1_player2 = match.Team1Players.Last();
-            var t2_player1 = match.Team2Players.First();
-            var t2_player2 = match.Team2Players.Last();
+            var t1_player1 = result.Team1Players.First();
+            var t1_player2 = result.Team1Players.Last();
+            var t2_player1 = result.Team2Players.First();
+            var t2_player2 = result.Team2Players.Last();
 
             Assert.Equal("Player 1", t1_player1.Name);
             Assert.Equal(991.1, t1_player1.CurrentElo, 1);
@@ -231,9 +243,9 @@ namespace RankedElo.Core.Tests
         }
 
         [Fact]
-        public void CalculateElo_EloChangeBelowZero_ReturnsZero()
+        public async Task CalculateElo_EloChangeBelowZero_ReturnsZero()
         {
-            var match = new TwoPlayerMatch()
+            IRankedMatch match = new TwoPlayerMatch()
             {
                 Player1 = new Player()
                 {
@@ -249,10 +261,10 @@ namespace RankedElo.Core.Tests
                 Team2Score = 1
             };
 
-            match.CalculateElo();
+            var result = await _service.AddMatchAsync<TwoPlayerMatch>(match);
 
-            var player1 = match.Player1;
-            var player2 = match.Player2;
+            var player1 = result.Player1;
+            var player2 = result.Player2;
 
 
             Assert.Equal("Player 1", player1.Name);
@@ -260,9 +272,9 @@ namespace RankedElo.Core.Tests
         }
 
         [Fact]
-        public void CalculateElo_TieGameWithSameElo_EloNotChanged()
+        public async Task CalculateElo_TieGameWithSameElo_EloNotChanged()
         {
-            var match = new TwoPlayerMatch()
+            IRankedMatch match = new TwoPlayerMatch()
             {
                 Player1 = new Player()
                 {
@@ -278,19 +290,19 @@ namespace RankedElo.Core.Tests
                 Team2Score = 1
             };
 
-            match.CalculateElo();
+            var result = await _service.AddMatchAsync<TwoPlayerMatch>(match);
 
-            var player1 = match.Player1;
-            var player2 = match.Player2;
+            var player1 = result.Player1;
+            var player2 = result.Player2;
 
             Assert.Equal(1000, player1.CurrentElo);
             Assert.Equal(1000, player2.CurrentElo);
         }
 
         [Fact]
-        public void CalculateElo_TieGameWithDifferentElo_EloChanged()
+        public async Task CalculateElo_TieGameWithDifferentElo_EloChanged()
         {
-            var match = new TwoPlayerMatch()
+            IRankedMatch match = new TwoPlayerMatch()
             {
                 Player1 = new Player()
                 {
@@ -306,10 +318,10 @@ namespace RankedElo.Core.Tests
                 Team2Score = 1
             };
 
-            match.CalculateElo();
+            var result = await _service.AddMatchAsync<TwoPlayerMatch>(match);
 
-            var player1 = match.Player1;
-            var player2 = match.Player2;
+            var player1 = result.Player1;
+            var player2 = result.Player2;
 
             Assert.Equal(1007.8, player1.CurrentElo, 1);
             Assert.Equal(1192.2, player2.CurrentElo, 1);
