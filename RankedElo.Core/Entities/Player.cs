@@ -17,5 +17,12 @@ namespace RankedElo.Core.Entities
                 .FirstOrDefault()?.Points ?? 1000d;
             set => EloHistory.Add(new Elo(value));
         }
+
+        public Player() { }
+
+        public Player(string name)
+        {
+            Name = name;
+        }
     }
 }

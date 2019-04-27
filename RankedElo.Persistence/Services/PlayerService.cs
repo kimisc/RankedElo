@@ -26,7 +26,9 @@ namespace RankedElo.Persistence.Services
 
         public async Task<Player> GetPlayerByNameAsync(string name)
         {
-            return await _context.Players.FirstOrDefaultAsync(x => x.Name == name);
+            return await _context.Players
+                .Include(p => p.EloHistory)
+                .FirstOrDefaultAsync(x => x.Name == name);
         }
 
         public async Task<IEnumerable<Player>> GetTopTenAsync()
