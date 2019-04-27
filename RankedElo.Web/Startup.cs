@@ -16,6 +16,7 @@ using RankedElo.Core.Interfaces;
 using RankedElo.Persistence.Contexts;
 using RankedElo.Persistence.Services;
 using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.EntityFrameworkCore.Sqlite;
 
 namespace RankedElo.Web
 {
@@ -33,9 +34,8 @@ namespace RankedElo.Web
             services.AddScoped<IMatchService, MatchService>();
             services.AddScoped<IPlayerService, PlayerService>();
 
-            string dbName = Guid.NewGuid().ToString();
             services.AddDbContext<RankedEloDbContext>(options =>
-                options.UseSqlServer(@"Server = .\SQLEXPRESS; Database = RankedFoosball; Trusted_Connection = True; ConnectRetryCount = 0"));
+                options.UseSqlite("Data Source=rankedElo.db"));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
