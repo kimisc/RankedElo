@@ -9,15 +9,8 @@ namespace RankedElo.Core.Entities
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public IList<Elo> EloHistory { get; set; } = new List<Elo>();
-
-        public double CurrentElo
-        {
-            get => EloHistory?
-                .OrderByDescending(elo => elo.Timestamp)
-                .FirstOrDefault()?.Points ?? Elo.DefaultPoints;
-            set => EloHistory.Add(new Elo(value));
-        }
+        public IList<Match> MatchHistory { get; set; } = new List<Match>();
+        public double CurrentElo { get; set; } = Elo.DefaultPoints;
 
         public Player() { }
 

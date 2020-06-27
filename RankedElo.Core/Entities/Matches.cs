@@ -8,6 +8,7 @@ namespace RankedElo.Core.Entities
 {
     public abstract class Match
     {
+        public abstract long Discriminator { get; }
         public int Id { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
@@ -22,10 +23,12 @@ namespace RankedElo.Core.Entities
 
         public void CalculateElo()
         {
-            var teamEloPoints = Elo.CalculateElo(Team1.CurrentElo, Team2.CurrentElo, Team1Score, Team2Score);
-            Team1.CurrentElo = teamEloPoints.team1elo;
-            Team2.CurrentElo = teamEloPoints.team2elo;
+            var (team1Elo, team2Elo) = Elo.CalculateElo(Team1.CurrentElo, Team2.CurrentElo, Team1Score, Team2Score);
+            Team1.CurrentElo = team1Elo;
+            Team2.CurrentElo = team2Elo;
         }
+
+        public override long Discriminator => 2;
     }
 
     public class TwoPlayerMatch : Match, IRankedMatch
@@ -35,10 +38,12 @@ namespace RankedElo.Core.Entities
 
         public void CalculateElo()
         {
-            var teamEloPoints = Elo.CalculateElo(Player1.CurrentElo, Player2.CurrentElo, Team1Score, Team2Score);
-            Player1.CurrentElo = teamEloPoints.team1elo;
-            Player2.CurrentElo = teamEloPoints.team2elo;
+            var (team1Elo, team2Elo) = Elo.CalculateElo(Player1.CurrentElo, Player2.CurrentElo, Team1Score, Team2Score);
+            Player1.CurrentElo = team1Elo;
+            Player2.CurrentElo = team2Elo;
         }
+
+        public override long Discriminator => 1;
     }
 
     public class SoloTeamMatch : Match, IRankedMatch
@@ -57,5 +62,7 @@ namespace RankedElo.Core.Entities
                 .ForEach(player =>
                     player.CurrentElo = Elo.CalculateElo(team2Elo, team1Elo, Team2Score, Team1Score, player.CurrentElo));
         }
+
+        public override long Discriminator => 3;
     }
 }

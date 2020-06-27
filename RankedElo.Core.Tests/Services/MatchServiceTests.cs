@@ -263,8 +263,6 @@ namespace RankedElo.Core.Tests.Services
             var result = await _sut.AddMatchAsync<TwoPlayerMatch>(match);
 
             var player1 = result.Player1;
-            var player2 = result.Player2;
-
 
             Assert.Equal("Player 1", player1.Name);
             Assert.Equal(0, player1.CurrentElo);

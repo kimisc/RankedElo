@@ -17,23 +17,13 @@ namespace RankedElo.Core.Tests
         }
 
         [Fact]
-        public void GetCurrentElo_EloHistoryFound_ReturnsLatestResult()
+        public void GetCurrentElo_HasCurrentElo_ReturnsLatestResult()
         {
             var Player = new Player
             {
-                EloHistory = new List<Elo> {
-                       new Elo {
-                           Timestamp = DateTime.Now,
-                           Points = 1200
-                       },
-                     new Elo {
-                           Timestamp = DateTime.Now.AddSeconds(5),
-                           Points = 1230
-                       },
-                }
+                CurrentElo = 1230
             };
-            var result = Player.CurrentElo;
-            Assert.Equal(1230, result);
+            Assert.Equal(1230, Player.CurrentElo);
         }
     }
 }

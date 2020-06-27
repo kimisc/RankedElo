@@ -25,7 +25,6 @@ namespace RankedElo.Persistence.Repositories
         public async Task<Player> GetPlayerByNameAsync(string name)
         {
             return await _context.Players
-                .Include(p => p.EloHistory)
                 .FirstOrDefaultAsync(x => x.Name == name);
         }
 
@@ -34,7 +33,6 @@ namespace RankedElo.Persistence.Repositories
             // TODO: Loads all players to sort on client side, degrades performance
             var allPlayers = await _context.Players
                 .AsNoTracking()
-                .Include(x => x.EloHistory)
                 .ToListAsync();
 
             return allPlayers

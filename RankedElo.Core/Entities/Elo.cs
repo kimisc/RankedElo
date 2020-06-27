@@ -5,18 +5,6 @@ namespace RankedElo.Core.Entities
     public class Elo
     {
         public static double DefaultPoints = 1000d;
-        public int Id { get; set; }
-        public DateTime Timestamp { get; set; }
-        public double Points { get; set; } = DefaultPoints;
-        public int? PlayerId { get; set; }
-        public int? TeamId { get; set; }
-
-        public Elo() {}
-
-        public Elo(double elo) {
-            Points = elo;
-            Timestamp = DateTime.UtcNow;
-        }
 
         public static (double team1elo, double team2elo) CalculateElo(double team1Elo, double team2Elo, int team1score, int team2score)
         {
