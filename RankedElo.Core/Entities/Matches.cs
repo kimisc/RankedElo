@@ -43,24 +43,14 @@ namespace RankedElo.Core.Entities
         }
     }
 
-    public class SoloTeamPlayer
-    {
-        public static int HomeTeam = 1;
-        public static int AwayTeam = 2;
-        public int PlayerId { get; set; }
-        public int MatchId { get; set; }
-        public Match Match { get; set; }
-        public Player Player { get; set; }
-        public int Team { get; set; }
-    }
     public class SoloTeamMatch : Match, IRankedMatch
     {
         public IList<SoloTeamPlayer> Players { get; set; }
 
         public void CalculateElo()
         {
-            var Team1Players = Players.Where(x => x.Team == SoloTeamPlayer.HomeTeam);
-            var Team2Players = Players.Where(x => x.Team == SoloTeamPlayer.AwayTeam);
+            var Team1Players = Players.Where(x => x.Team == TeamSide.Home);
+            var Team2Players = Players.Where(x => x.Team == TeamSide.Away);
             var team1Elo = Team1Players.Average(x => x.Player.CurrentElo);
             var team2Elo = Team2Players.Average(x => x.Player.CurrentElo);
             Team1Players.ToList()

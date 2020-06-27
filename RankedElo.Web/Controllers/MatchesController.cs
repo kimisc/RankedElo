@@ -25,6 +25,7 @@ namespace RankedElo.Web.Controllers
         [HttpPost("team")]
         public async Task<IActionResult> AddMatch(TeamMatch match)
         {
+            // TODO: Dto to simplify client
             await _matchService.AddMatchAsync<TeamMatch>(match);
             return Ok();
         }
@@ -34,7 +35,7 @@ namespace RankedElo.Web.Controllers
         {
             var playerTasks = matchDto.Players.Select(async x => new SoloTeamPlayer {
                Player = await GetOrCreatePlayer(x.Name),
-               Team = x.Team
+               Team = (TeamSide)x.Team
             });
             var soloTeamPlayers = await Task.WhenAll(playerTasks);
 
@@ -53,6 +54,7 @@ namespace RankedElo.Web.Controllers
         [HttpPost("twoplayer")]
         public async Task<IActionResult> AddMatch(TwoPlayerMatchDto matchDto)
         {
+            // TODO: Fluentvalidation and middleware
             if(!ModelState.IsValid) 
             {
                 return BadRequest();

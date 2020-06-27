@@ -12,43 +12,43 @@ namespace RankedElo.Core.Tests.Services
     public class MatchServiceTests
     {
         private readonly IMatchService _sut;
-        private List<SoloTeamPlayer> _soloPlayers => new List<SoloTeamPlayer>
+        private List<SoloTeamPlayer> SoloPlayers => new List<SoloTeamPlayer>
         {
-            new SoloTeamPlayer()
+            new SoloTeamPlayer
             {
-                Player = new Player()
+                Player = new Player
                 {
                     Name = "Player 1",
                     CurrentElo = 1000
                 },
-                Team = 1
+                Team = TeamSide.Home
             },
-            new SoloTeamPlayer()
+            new SoloTeamPlayer
             {
-                Player = new Player()
+                Player = new Player
                 {
                     Name = "Player 3",
                     CurrentElo = 900
                 },
-                Team = 1
+                Team = TeamSide.Home
             },
-            new SoloTeamPlayer()
+            new SoloTeamPlayer
             {
-                Player = new Player()
+                Player = new Player
                 {
                     Name = "Player 2",
                     CurrentElo = 1000
                 },
-                Team = 2
+                Team = TeamSide.Away
             },
-            new SoloTeamPlayer()
+            new SoloTeamPlayer
             {
-                Player = new Player()
+                Player = new Player
                 {
                     Name = "Player 4",
                     CurrentElo = 1200
                 },
-                Team = 2
+                Team = TeamSide.Away
             }
         };
         public MatchServiceTests()
@@ -60,14 +60,14 @@ namespace RankedElo.Core.Tests.Services
         [Fact]
         public async Task CalculateElo_TwoPlayersTeam1Wins_EloUpdated()
         {
-            IRankedMatch match = new TwoPlayerMatch()
+            IRankedMatch match = new TwoPlayerMatch
             {
-                Player1 = new Player()
+                Player1 = new Player
                 {
                     Name = "Player 1",
                     CurrentElo = 1200
                 },
-                Player2 = new Player()
+                Player2 = new Player
                 {
                     Name = "Player 2",
                     CurrentElo = 1000
@@ -90,14 +90,14 @@ namespace RankedElo.Core.Tests.Services
         [Fact]
         public async Task CalculateElo_TwoPlayersTeam2Wins_EloUpdated()
         {
-            IRankedMatch match = new TwoPlayerMatch()
+            IRankedMatch match = new TwoPlayerMatch
             {
-                Player1 = new Player()
+                Player1 = new Player
                 {
                     Name = "Player 1",
                     CurrentElo = 1200
                 },
-                Player2 = new Player()
+                Player2 = new Player
                 {
                     Name = "Player 2",
                     CurrentElo = 1000
@@ -184,15 +184,15 @@ namespace RankedElo.Core.Tests.Services
         {
             IRankedMatch match = new SoloTeamMatch
             {
-                Players = _soloPlayers,
+                Players = SoloPlayers,
                 Team1Score = team1score,
                 Team2Score = team2score
             };
 
             var result = await _sut.AddMatchAsync<SoloTeamMatch>(match);
 
-            var team1 = result.Players.Where(x => x.Team == 1);
-            var team2 = result.Players.Where(x => x.Team == 2);
+            var team1 = result.Players.Where(x => x.Team == TeamSide.Home);
+            var team2 = result.Players.Where(x => x.Team == TeamSide.Away);
             var t1_player1 = team1.First().Player;
             var t1_player2 = team1.Last().Player;
             var t2_player1 = team2.First().Player;
@@ -211,14 +211,14 @@ namespace RankedElo.Core.Tests.Services
         [Fact]
         public async Task CalculateElo_EloChangeBelowZero_ReturnsZero()
         {
-            IRankedMatch match = new TwoPlayerMatch()
+            IRankedMatch match = new TwoPlayerMatch
             {
-                Player1 = new Player()
+                Player1 = new Player
                 {
                     Name = "Player 1",
                     CurrentElo = 0
                 },
-                Player2 = new Player()
+                Player2 = new Player
                 {
                     Name = "Player 2",
                     CurrentElo = 1000
@@ -238,14 +238,14 @@ namespace RankedElo.Core.Tests.Services
         [Fact]
         public async Task CalculateElo_TieGameWithSameElo_EloNotChanged()
         {
-            IRankedMatch match = new TwoPlayerMatch()
+            IRankedMatch match = new TwoPlayerMatch
             {
-                Player1 = new Player()
+                Player1 = new Player
                 {
                     Name = "Player 1",
                     CurrentElo = 1000
                 },
-                Player2 = new Player()
+                Player2 = new Player
                 {
                     Name = "Player 2",
                     CurrentElo = 1000
@@ -266,14 +266,14 @@ namespace RankedElo.Core.Tests.Services
         [Fact]
         public async Task CalculateElo_TieGameWithDifferentElo_EloChanged()
         {
-            IRankedMatch match = new TwoPlayerMatch()
+            IRankedMatch match = new TwoPlayerMatch
             {
-                Player1 = new Player()
+                Player1 = new Player
                 {
                     Name = "Player 1",
                     CurrentElo = 1000
                 },
-                Player2 = new Player()
+                Player2 = new Player
                 {
                     Name = "Player 2",
                     CurrentElo = 1200
