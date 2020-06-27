@@ -22,14 +22,9 @@ namespace RankedElo.Core.Entities
 
         public void CalculateElo()
         {
-            var team1Probability = Elo.CalculateProbability(Team2.CurrentElo, Team1.CurrentElo);
-            var team2Probability = Elo.CalculateProbability(Team1.CurrentElo, Team2.CurrentElo);
-
-            var team1ActualScore = Elo.CalculateActualScore(Team1Score, Team2Score);
-            var team2ActualScore = Elo.CalculateActualScore(Team2Score, Team1Score);
-
-            Team1.CurrentElo = Elo.CalculateEloForSingleParticipant(Team1.CurrentElo, team1Probability, team1ActualScore);
-            Team2.CurrentElo = Elo.CalculateEloForSingleParticipant(Team2.CurrentElo, team2Probability, team2ActualScore);
+            var teamEloPoints = Elo.CalculateElo(Team1.CurrentElo, Team2.CurrentElo, Team1Score, Team2Score);
+            Team1.CurrentElo = teamEloPoints.team1elo;
+            Team2.CurrentElo = teamEloPoints.team2elo;
         }
     }
 
@@ -40,14 +35,9 @@ namespace RankedElo.Core.Entities
 
         public void CalculateElo()
         {
-            var team1Probability = Elo.CalculateProbability(Player2.CurrentElo, Player1.CurrentElo);
-            var team2Probability = Elo.CalculateProbability(Player1.CurrentElo, Player2.CurrentElo);
-
-            var team1ActualScore = Elo.CalculateActualScore(Team1Score, Team2Score);
-            var team2ActualScore = Elo.CalculateActualScore(Team2Score, Team1Score);
-
-            Player1.CurrentElo = Elo.CalculateEloForSingleParticipant(Player1.CurrentElo, team1Probability, team1ActualScore);
-            Player2.CurrentElo = Elo.CalculateEloForSingleParticipant(Player2.CurrentElo, team2Probability, team2ActualScore);
+            var teamEloPoints = Elo.CalculateElo(Player1.CurrentElo, Player2.CurrentElo, Team1Score, Team2Score);
+            Player1.CurrentElo = teamEloPoints.team1elo;
+            Player2.CurrentElo = teamEloPoints.team2elo;
         }
     }
 
@@ -55,21 +45,17 @@ namespace RankedElo.Core.Entities
     {
         public IList<Player> Team1Players { get; set; }
         public IList<Player> Team2Players { get; set; }
-        public double Team1Elo => Team1Players.Average(x => x.CurrentElo);
-        public double Team2Elo => Team2Players.Average(x => x.CurrentElo);
 
         public void CalculateElo()
         {
-            var team1Probability = Elo.CalculateProbability(Team2Elo, Team1Elo);
-            var team2Probability = Elo.CalculateProbability(Team1Elo, Team2Elo);
-
-            var team1ActualScore = Elo.CalculateActualScore(Team1Score, Team2Score);
-            var team2ActualScore = Elo.CalculateActualScore(Team2Score, Team1Score);
-
+            var team1Elo = Team1Players.Average(x => x.CurrentElo); ;
+            var team2Elo = Team2Players.Average(x => x.CurrentElo); ;
             Team1Players.ToList()
-                .ForEach(player => player.CurrentElo = Elo.CalculateEloForSingleParticipant(player.CurrentElo, team1Probability, team1ActualScore));
+                .ForEach(player =>
+                    player.CurrentElo = Elo.CalculateElo(team1Elo, team2Elo, Team1Score, Team2Score, player.CurrentElo));
             Team2Players.ToList()
-                .ForEach(player => player.CurrentElo = Elo.CalculateEloForSingleParticipant(player.CurrentElo, team2Probability, team2ActualScore));
+                .ForEach(player =>
+                    player.CurrentElo = Elo.CalculateElo(team2Elo, team1Elo, Team2Score, Team1Score, player.CurrentElo));
         }
     }
 }

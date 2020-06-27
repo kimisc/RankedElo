@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace RankedElo.Core.Entities
 {
@@ -19,12 +16,32 @@ namespace RankedElo.Core.Entities
             Points = elo;
             Timestamp = DateTime.UtcNow;
         }
-        public static double CalculateProbability(double rating1, double rating2)
+
+        public static (double team1elo, double team2elo) CalculateElo(double team1Elo, double team2Elo, int team1score, int team2score)
+        {
+            var team1Probability = CalculateProbability(team2Elo, team1Elo);
+            var team2Probability = CalculateProbability(team1Elo, team2Elo);
+
+            var team1ActualScore = CalculateActualScore(team1score, team2score);
+            var team2ActualScore = CalculateActualScore(team2score, team1score);
+            var team1Result = CalculateEloForSingleParticipant(team1Elo, team1Probability, team1ActualScore);
+            var team2Result = CalculateEloForSingleParticipant(team2Elo, team2Probability, team2ActualScore);
+            return (team1Result, team2Result);
+        }
+
+        public static double CalculateElo(double team1Elo, double team2Elo, int team1Score, int team2Score, double playerElo)
+        {
+            var team1Probability = CalculateProbability(team2Elo, team1Elo);
+            var team1ActualScore = CalculateActualScore(team1Score, team2Score);
+            return CalculateEloForSingleParticipant(playerElo, team1Probability, team1ActualScore);
+        }
+
+        private static double CalculateProbability(double rating1, double rating2)
         {
             return 1.0d * 1.0d / (1 + 1.0d * Math.Pow(10, 1.0d * (rating1 - rating2) / 400));
         }
 
-        public static float CalculateActualScore(int team1Score, int team2Score)
+        private static float CalculateActualScore(int team1Score, int team2Score)
         {
             if(team1Score == team2Score)
             {
@@ -34,7 +51,7 @@ namespace RankedElo.Core.Entities
             return team1Score > team2Score ? 1 : 0;
         }
 
-        public static double CalculateEloForSingleParticipant(double currentElo, double probability, float actualScore, int k = 30)
+        private static double CalculateEloForSingleParticipant(double currentElo, double probability, float actualScore, int k = 30)
         {
             var elo = currentElo + k * (actualScore - probability);
 
