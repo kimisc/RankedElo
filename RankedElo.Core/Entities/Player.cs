@@ -9,7 +9,6 @@ namespace RankedElo.Core.Entities
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public IList<Match> MatchHistory { get; set; } = new List<Match>();
         public double CurrentElo { get; set; } = Elo.DefaultPoints;
 
         public Player() { }

@@ -12,6 +12,45 @@ namespace RankedElo.Core.Tests.Services
     public class MatchServiceTests
     {
         private readonly IMatchService _sut;
+        private List<SoloTeamPlayer> _soloPlayers => new List<SoloTeamPlayer>
+        {
+            new SoloTeamPlayer()
+            {
+                Player = new Player()
+                {
+                    Name = "Player 1",
+                    CurrentElo = 1000
+                },
+                Team = 1
+            },
+            new SoloTeamPlayer()
+            {
+                Player = new Player()
+                {
+                    Name = "Player 3",
+                    CurrentElo = 900
+                },
+                Team = 1
+            },
+            new SoloTeamPlayer()
+            {
+                Player = new Player()
+                {
+                    Name = "Player 2",
+                    CurrentElo = 1000
+                },
+                Team = 2
+            },
+            new SoloTeamPlayer()
+            {
+                Player = new Player()
+                {
+                    Name = "Player 4",
+                    CurrentElo = 1200
+                },
+                Team = 2
+            }
+        };
         public MatchServiceTests()
         {
             var repositoryStub = Substitute.For<IMatchRepository>();
@@ -137,108 +176,36 @@ namespace RankedElo.Core.Tests.Services
             Assert.Equal(1022.8, team2.CurrentElo, 1);
         }
 
-        [Fact]
-        public async Task CalculateElo_MultiplePlayersTeam1Wins_TeamAverageUsed()
+        [Theory]
+        [InlineData(1, 0, "Player 1", 1021.1, "Player 3", 921.1, "Player 2", 978.9, "Player 4", 1178.9)]
+        [InlineData(0, 1, "Player 1", 991.1, "Player 3", 891.1, "Player 2", 1008.9, "Player 4", 1208.9)]
+        public async Task CalculateElo_MultiplePlayers_TeamAverageUsed(int team1score, int team2score,
+            string p1name, double p1elo, string p2name, double p2elo, string p3name, double p3elo, string p4name, double p4elo)
         {
             IRankedMatch match = new SoloTeamMatch
             {
-                Team1Players = new List<Player>
-                {
-                    new Player()
-                    {
-                        Name = "Player 1",
-                        CurrentElo = 1000
-                    },
-                    new Player()
-                    {
-                        Name = "Player 3",
-                        CurrentElo = 900
-                    }
-                },
-                Team2Players = new List<Player>
-                {
-                    new Player()
-                    {
-                        Name = "Player 2",
-                        CurrentElo = 1000
-                    },
-                    new Player()
-                    {
-                        Name = "Player 4",
-                        CurrentElo = 1200
-                    }
-                },
-                Team1Score = 1,
-                Team2Score = 0
+                Players = _soloPlayers,
+                Team1Score = team1score,
+                Team2Score = team2score
             };
 
             var result = await _sut.AddMatchAsync<SoloTeamMatch>(match);
 
-            var t1_player1 = result.Team1Players.First();
-            var t1_player2 = result.Team1Players.Last();
-            var t2_player1 = result.Team2Players.First();
-            var t2_player2 = result.Team2Players.Last();
+            var team1 = result.Players.Where(x => x.Team == 1);
+            var team2 = result.Players.Where(x => x.Team == 2);
+            var t1_player1 = team1.First().Player;
+            var t1_player2 = team1.Last().Player;
+            var t2_player1 = team2.First().Player;
+            var t2_player2 = team2.Last().Player;
 
-            Assert.Equal("Player 1", t1_player1.Name);
-            Assert.Equal(1021.1, t1_player1.CurrentElo, 1);
-            Assert.Equal("Player 3", t1_player2.Name);
-            Assert.Equal(921.1, t1_player2.CurrentElo, 1);
-            Assert.Equal("Player 2", t2_player1.Name);
-            Assert.Equal(978.9, t2_player1.CurrentElo, 1);
-            Assert.Equal("Player 4", t2_player2.Name);
-            Assert.Equal(1178.9, t2_player2.CurrentElo, 1);
-        }
-
-        [Fact]
-        public async Task CalculateElo_MultiplePlayersTeam2Wins_TeamAverageUsed()
-        {
-            IRankedMatch match = new SoloTeamMatch
-            {
-                Team1Players = new List<Player>
-                {
-                    new Player()
-                    {
-                        Name = "Player 1",
-                        CurrentElo = 1000
-                    },
-                    new Player()
-                    {
-                        Name = "Player 3",
-                        CurrentElo = 900
-                    }
-                },
-                Team2Players = new List<Player>
-                {
-                    new Player()
-                    {
-                        Name = "Player 2",
-                        CurrentElo = 1000
-                    },
-                    new Player()
-                    {
-                        Name = "Player 4",
-                        CurrentElo = 1200
-                    }
-                },
-                Team1Score = 0,
-                Team2Score = 1
-            };
-
-            var result = await _sut.AddMatchAsync<SoloTeamMatch>(match);
-
-            var t1_player1 = result.Team1Players.First();
-            var t1_player2 = result.Team1Players.Last();
-            var t2_player1 = result.Team2Players.First();
-            var t2_player2 = result.Team2Players.Last();
-
-            Assert.Equal("Player 1", t1_player1.Name);
-            Assert.Equal(991.1, t1_player1.CurrentElo, 1);
-            Assert.Equal("Player 3", t1_player2.Name);
-            Assert.Equal(891.1, t1_player2.CurrentElo, 1);
-            Assert.Equal("Player 2", t2_player1.Name);
-            Assert.Equal(1008.9, t2_player1.CurrentElo, 1);
-            Assert.Equal("Player 4", t2_player2.Name);
-            Assert.Equal(1208.9, t2_player2.CurrentElo, 1);
+            Assert.Equal(p1name, t1_player1.Name);
+            Assert.Equal(p1elo, t1_player1.CurrentElo, 1);
+            Assert.Equal(p2name, t1_player2.Name);
+            Assert.Equal(p2elo, t1_player2.CurrentElo, 1);
+            Assert.Equal(p3name, t2_player1.Name);
+            Assert.Equal(p3elo, t2_player1.CurrentElo, 1);
+            Assert.Equal(p4name, t2_player2.Name);
+            Assert.Equal(p4elo, t2_player2.CurrentElo, 1);
         }
 
         [Fact]

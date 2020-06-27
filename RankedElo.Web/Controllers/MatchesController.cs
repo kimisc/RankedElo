@@ -30,21 +30,35 @@ namespace RankedElo.Web.Controllers
         }
 
         [HttpPost("soloteam")]
-        public async Task<IActionResult> AddMatch(SoloTeamMatch match)
+        public async Task<IActionResult> AddMatch(SoloTeamBaseMatchDto matchDto)
         {
-            await _matchService.AddMatchAsync<SoloTeamMatch>(match);
-            return Ok();
+            var playerTasks = matchDto.Players.Select(async x => new SoloTeamPlayer {
+               Player = await GetOrCreatePlayer(x.Name),
+               Team = x.Team
+            });
+            var soloTeamPlayers = await Task.WhenAll(playerTasks);
+
+            var match = new SoloTeamMatch()
+            {
+                EndTime = matchDto.EndTime,
+                StartTime = matchDto.StartTime,
+                Team1Score = matchDto.Team1Score,
+                Team2Score = matchDto.Team2Score,
+                Players = soloTeamPlayers
+            };
+            var result = await _matchService.AddMatchAsync<SoloTeamMatch>(match);
+            return Ok(result);
         }
 
         [HttpPost("twoplayer")]
-        public async Task<IActionResult> AddMatch(TwoPlayerMatchDTO matchDto)
+        public async Task<IActionResult> AddMatch(TwoPlayerMatchDto matchDto)
         {
             if(!ModelState.IsValid) 
             {
                 return BadRequest();
             }
-            var player1 = await _playerRepository.GetPlayerByNameAsync(matchDto.Player1Name) ?? new Player(matchDto.Player1Name);
-            var player2 = await _playerRepository.GetPlayerByNameAsync(matchDto.Player2Name) ?? new Player(matchDto.Player2Name);
+            var player1 = await GetOrCreatePlayer(matchDto.Player1Name);
+            var player2 = await GetOrCreatePlayer(matchDto.Player2Name);
 
             var match = new TwoPlayerMatch 
             {
@@ -58,6 +72,11 @@ namespace RankedElo.Web.Controllers
 
             var result = await _matchService.AddMatchAsync<TwoPlayerMatch>(match);
             return Ok(result);
+        }
+
+        private async Task<Player> GetOrCreatePlayer(string name)
+        {
+            return await _playerRepository.GetPlayerByNameAsync(name) ?? new Player(name);
         }
 
     }

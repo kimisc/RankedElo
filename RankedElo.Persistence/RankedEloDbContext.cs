@@ -1,44 +1,30 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.IO;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using RankedElo.Core.Entities;
 
 namespace RankedElo.Persistence
 {
     public class RankedEloDbContext : DbContext
     {
+        public RankedEloDbContext()
+        {
+        }
+        public RankedEloDbContext(DbContextOptions<RankedEloDbContext> options) : base(options) { }
 
-        public RankedEloDbContext(DbContextOptions<RankedEloDbContext> options): base(options) { }
-
-        public DbSet<TwoPlayerMatch> TwoPlayerMatches { get; set; }
-        public DbSet<TeamMatch> TeamMatches { get; set; }
-        public DbSet<SoloTeamMatch> SoloTeamMatches { get; set; }
-        public DbSet<Team> Teams { get; set; }
+        public DbSet<Match> Matches { get; set; }
         public DbSet<Player> Players { get; set; }
-        public DbSet<Elo> EloHistory { get; set; }
+        public DbSet<Team> Teams { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Team>()
-                .Ignore(x => x.CurrentElo);
-                
-            modelBuilder.Entity<Player>()
-                .Ignore(x => x.CurrentElo);
+            modelBuilder.Entity<Match>().HasDiscriminator<int>("Type")
+                .HasValue<Match>(-1)
+                .HasValue<TwoPlayerMatch>(1)
+                .HasValue<TeamMatch>(2)
+                .HasValue<SoloTeamMatch>(3);
 
-            modelBuilder.Entity<SoloTeamMatch>()
-                .Ignore(x => x.Team1Players)
-                .Ignore(x => x.Team2Players);
-
-            modelBuilder.Entity<PlayerSoloTeamMatches>()
-            .HasKey(bc => new { bc.PlayerId, bc.SoloTeamMatchId });
-
-            modelBuilder.Entity<PlayerSoloTeamMatches>()
-                .HasOne(bc => bc.Player)
-                .WithMany()
-                .HasForeignKey(bc => bc.PlayerId);
-
-            modelBuilder.Entity<PlayerSoloTeamMatches>()
-                .HasOne(bc => bc.SoloTeamMatch)
-                .WithMany()
-                .HasForeignKey(bc => bc.SoloTeamMatchId);
+            modelBuilder.Entity<SoloTeamPlayer>().HasKey(sp => new {sp.PlayerId, sp.MatchId});
         }
     }
 }
