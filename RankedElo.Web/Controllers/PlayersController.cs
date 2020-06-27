@@ -12,23 +12,23 @@ namespace RankedElo.Web.Controllers
     [ApiController]
     public class PlayersController : ControllerBase
     {
-        public readonly IPlayerService _playerService; 
+        public readonly IPlayerRepository PlayerRepository; 
 
-        public PlayersController(IPlayerService playerService)
+        public PlayersController(IPlayerRepository playerRepository)
         {
-            _playerService = playerService ?? throw new ArgumentNullException(nameof(playerService));
+            PlayerRepository = playerRepository ?? throw new ArgumentNullException(nameof(playerRepository));
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            return Ok(await _playerService.GetAllPlayersAsync());
+            return Ok(await PlayerRepository.GetAllPlayersAsync());
         }
 
         [HttpGet("{name}")]
         public async Task<IActionResult> GetByName(string name)
         {
-            var player = await _playerService.GetPlayerByNameAsync(name);
+            var player = await PlayerRepository.GetPlayerByNameAsync(name);
 
             if(player is null)
             {
@@ -41,7 +41,7 @@ namespace RankedElo.Web.Controllers
         [HttpGet("topten")]
         public async Task<IActionResult> GetTopTenAsync()
         {
-            return Ok(await _playerService.GetTopTenAsync());
+            return Ok(await PlayerRepository.GetTopTenAsync());
         }
     }
 }

@@ -14,12 +14,12 @@ namespace RankedElo.Web.Controllers
     public class MatchesController : Controller
     {
         private readonly IMatchService _matchService;
-        private readonly IPlayerService _playerService;
+        private readonly IPlayerRepository _playerRepository;
 
-        public MatchesController(IMatchService matchService, IPlayerService playerService)
+        public MatchesController(IMatchService matchService, IPlayerRepository playerRepository)
         {
             _matchService = matchService ?? throw new ArgumentNullException(nameof(matchService));
-            _playerService = playerService ?? throw new ArgumentNullException(nameof(playerService));
+            _playerRepository = playerRepository ?? throw new ArgumentNullException(nameof(playerRepository));
         }
 
         [HttpPost("team")]
@@ -43,8 +43,8 @@ namespace RankedElo.Web.Controllers
             {
                 return BadRequest();
             }
-            var player1 = await _playerService.GetPlayerByNameAsync(matchDto.Player1Name) ?? new Player(matchDto.Player1Name);
-            var player2 = await _playerService.GetPlayerByNameAsync(matchDto.Player2Name) ?? new Player(matchDto.Player2Name);
+            var player1 = await _playerRepository.GetPlayerByNameAsync(matchDto.Player1Name) ?? new Player(matchDto.Player1Name);
+            var player2 = await _playerRepository.GetPlayerByNameAsync(matchDto.Player2Name) ?? new Player(matchDto.Player2Name);
 
             var match = new TwoPlayerMatch 
             {

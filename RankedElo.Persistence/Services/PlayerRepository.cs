@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace RankedElo.Persistence.Services
 {
-    public class PlayerService : IPlayerService
+    public class PlayerRepository : IPlayerRepository
     {
         private readonly RankedEloDbContext _context;
 
-        public PlayerService(RankedEloDbContext context)
+        public PlayerRepository(RankedEloDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
@@ -33,10 +33,15 @@ namespace RankedElo.Persistence.Services
 
         public async Task<IEnumerable<Player>> GetTopTenAsync()
         {
-            return await _context.Players
-                .OrderByDescending(x => x.CurrentElo)
-                .Take(10)
+            // TODO: Loads all players to sort on client side, degrades performance
+            var allPlayers = await _context.Players
+                .AsNoTracking()
+                .Include(x => x.EloHistory)
                 .ToListAsync();
+
+            return allPlayers
+                .OrderByDescending(x => x.CurrentElo)
+                .Take(10);
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RankedElo.Core.Interfaces
 {
-    public interface IPlayerService
+    public interface IPlayerRepository
     {
         Task<Player> GetPlayerByNameAsync(string name);
         Task<IEnumerable<Player>> GetAllPlayersAsync();
