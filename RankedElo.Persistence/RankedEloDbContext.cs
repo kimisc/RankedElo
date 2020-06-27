@@ -1,10 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RankedElo.Core.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace RankedElo.Persistence.Contexts
+namespace RankedElo.Persistence
 {
     public class RankedEloDbContext : DbContext
     {

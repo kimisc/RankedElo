@@ -1,13 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using RankedElo.Core.Entities;
-using RankedElo.Core.Interfaces;
-using RankedElo.Persistence.Contexts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Threading.Tasks;
+using RankedElo.Core.Interfaces;
 
-namespace RankedElo.Persistence.Services
+namespace RankedElo.Persistence.Repositories
 {
     public class MatchRepository : IMatchRepository
     {

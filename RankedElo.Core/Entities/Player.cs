@@ -10,11 +10,12 @@ namespace RankedElo.Core.Entities
         public int Id { get; set; }
         public string Name { get; set; }
         public IList<Elo> EloHistory { get; set; } = new List<Elo>();
+
         public double CurrentElo
         {
             get => EloHistory?
                 .OrderByDescending(elo => elo.Timestamp)
-                .FirstOrDefault()?.Points ?? 1000d;
+                .FirstOrDefault()?.Points ?? Elo.DefaultPoints;
             set => EloHistory.Add(new Elo(value));
         }
 

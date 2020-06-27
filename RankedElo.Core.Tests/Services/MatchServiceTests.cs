@@ -1,22 +1,21 @@
-using RankedElo.Core.Entities;
-using RankedElo.Core.Services;
-using RankedElo.Core.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Xunit;
-using NSubstitute;
 using System.Threading.Tasks;
+using NSubstitute;
+using RankedElo.Core.Entities;
+using RankedElo.Core.Interfaces;
+using RankedElo.Core.Services;
+using Xunit;
 
-namespace RankedElo.Core.Tests
+namespace RankedElo.Core.Tests.Services
 {
     public class MatchServiceTests
     {
-        private readonly IMatchService _service;
+        private readonly IMatchService _sut;
         public MatchServiceTests()
         {
             var repositoryStub = Substitute.For<IMatchRepository>();
-            _service = new MatchService(repositoryStub);
+            _sut = new MatchService(repositoryStub);
         }
 
         [Fact]
@@ -38,7 +37,7 @@ namespace RankedElo.Core.Tests
                 Team2Score = 0
             };
 
-            var result = await _service.AddMatchAsync<TwoPlayerMatch>(match);
+            var result = await _sut.AddMatchAsync<TwoPlayerMatch>(match);
 
             var player1 = result.Player1;
             var player2 = result.Player2;
@@ -68,7 +67,7 @@ namespace RankedElo.Core.Tests
                 Team2Score = 1
             };
 
-            var result = await _service.AddMatchAsync<TwoPlayerMatch>(match);
+            var result = await _sut.AddMatchAsync<TwoPlayerMatch>(match);
 
             var player1 = result.Player1;
             var player2 = result.Player2;
@@ -98,7 +97,7 @@ namespace RankedElo.Core.Tests
                 Team2Score = 0
             };
 
-            var result = await _service.AddMatchAsync<TeamMatch>(match);
+            var result = await _sut.AddMatchAsync<TeamMatch>(match);
 
             var team1 = result.Team1;
             var team2 = result.Team2;
@@ -127,7 +126,7 @@ namespace RankedElo.Core.Tests
                 Team1Score = 0,
                 Team2Score = 1
             };
-            var result = await _service.AddMatchAsync<TeamMatch>(match);
+            var result = await _sut.AddMatchAsync<TeamMatch>(match);
 
             var team1 = result.Team1;
             var team2 = result.Team2;
@@ -173,7 +172,7 @@ namespace RankedElo.Core.Tests
                 Team2Score = 0
             };
 
-            var result = await _service.AddMatchAsync<SoloTeamMatch>(match);
+            var result = await _sut.AddMatchAsync<SoloTeamMatch>(match);
 
             var t1_player1 = result.Team1Players.First();
             var t1_player2 = result.Team1Players.Last();
@@ -225,7 +224,7 @@ namespace RankedElo.Core.Tests
                 Team2Score = 1
             };
 
-            var result = await _service.AddMatchAsync<SoloTeamMatch>(match);
+            var result = await _sut.AddMatchAsync<SoloTeamMatch>(match);
 
             var t1_player1 = result.Team1Players.First();
             var t1_player2 = result.Team1Players.Last();
@@ -261,7 +260,7 @@ namespace RankedElo.Core.Tests
                 Team2Score = 1
             };
 
-            var result = await _service.AddMatchAsync<TwoPlayerMatch>(match);
+            var result = await _sut.AddMatchAsync<TwoPlayerMatch>(match);
 
             var player1 = result.Player1;
             var player2 = result.Player2;
@@ -290,7 +289,7 @@ namespace RankedElo.Core.Tests
                 Team2Score = 1
             };
 
-            var result = await _service.AddMatchAsync<TwoPlayerMatch>(match);
+            var result = await _sut.AddMatchAsync<TwoPlayerMatch>(match);
 
             var player1 = result.Player1;
             var player2 = result.Player2;
@@ -318,7 +317,7 @@ namespace RankedElo.Core.Tests
                 Team2Score = 1
             };
 
-            var result = await _service.AddMatchAsync<TwoPlayerMatch>(match);
+            var result = await _sut.AddMatchAsync<TwoPlayerMatch>(match);
 
             var player1 = result.Player1;
             var player2 = result.Player2;

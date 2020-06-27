@@ -15,7 +15,7 @@ namespace RankedElo.Core.Entities
         {
             get => EloHistory?
                 .OrderByDescending(elo => elo.Timestamp)
-                .FirstOrDefault()?.Points ?? 1000d;
+                .FirstOrDefault()?.Points ?? Elo.DefaultPoints;
             set => EloHistory.Add(new Elo(value));
         }
     }

@@ -5,9 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RankedElo.Core.Interfaces;
 using RankedElo.Core.Services;
-using RankedElo.Persistence.Contexts;
-using RankedElo.Persistence.Services;
 using Microsoft.Extensions.Hosting;
+using RankedElo.Persistence.Data;
+using RankedElo.Persistence.Repositories;
 
 namespace RankedElo.Web
 {

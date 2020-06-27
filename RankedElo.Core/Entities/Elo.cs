@@ -4,9 +4,10 @@ namespace RankedElo.Core.Entities
 {
     public class Elo
     {
+        public static double DefaultPoints = 1000d;
         public int Id { get; set; }
         public DateTime Timestamp { get; set; }
-        public double Points { get; set; } = 1000d;
+        public double Points { get; set; } = DefaultPoints;
         public int? PlayerId { get; set; }
         public int? TeamId { get; set; }
 
