@@ -14,28 +14,29 @@ namespace RankedElo.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.5");
+                .HasAnnotation("ProductVersion", "3.1.5")
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("RankedElo.Core.Entities.Match", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("EndTime")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("StartTime")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("Team1Score")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("Team2Score")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("Type")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -48,13 +49,13 @@ namespace RankedElo.Persistence.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<double>("CurrentElo")
-                        .HasColumnType("REAL");
+                        .HasColumnType("double");
 
                     b.Property<string>("Name")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.HasKey("Id");
 
@@ -64,16 +65,16 @@ namespace RankedElo.Persistence.Migrations
             modelBuilder.Entity("RankedElo.Core.Entities.SoloTeamPlayer", b =>
                 {
                     b.Property<int>("PlayerId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("MatchId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int?>("SoloTeamMatchId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("Team")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.HasKey("PlayerId", "MatchId");
 
@@ -88,13 +89,13 @@ namespace RankedElo.Persistence.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<double>("CurrentElo")
-                        .HasColumnType("REAL");
+                        .HasColumnType("double");
 
                     b.Property<string>("Name")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.HasKey("Id");
 
@@ -113,10 +114,10 @@ namespace RankedElo.Persistence.Migrations
                     b.HasBaseType("RankedElo.Core.Entities.Match");
 
                     b.Property<int?>("Team1Id")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int?>("Team2Id")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.HasIndex("Team1Id");
 
@@ -130,10 +131,10 @@ namespace RankedElo.Persistence.Migrations
                     b.HasBaseType("RankedElo.Core.Entities.Match");
 
                     b.Property<int?>("Player1Id")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int?>("Player2Id")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.HasIndex("Player1Id");
 
