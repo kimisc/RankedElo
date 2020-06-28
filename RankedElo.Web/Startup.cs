@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -8,6 +9,7 @@ using RankedElo.Core.Services;
 using Microsoft.Extensions.Hosting;
 using RankedElo.Persistence;
 using RankedElo.Persistence.Repositories;
+using RankedElo.Web.Models;
 
 namespace RankedElo.Web
 {
@@ -25,11 +27,13 @@ namespace RankedElo.Web
             services.AddScoped<IMatchService, MatchService>();
             services.AddScoped<IMatchRepository, MatchRepository>();
             services.AddScoped<IPlayerRepository, PlayerRepository>();
+            services.AddScoped<ITeamRepository, TeamRepository>();
 
             services.AddDbContext<RankedEloDbContext>(options =>
                 options.UseSqlite("Data Source=rankedElo.db"));
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<BaseMatchDtoValidator<BaseMatchDto>>());
             services.AddSwaggerGen();
         }
 

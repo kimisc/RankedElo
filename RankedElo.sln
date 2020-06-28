@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2050
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RankedElo.Core", "RankedElo.Core\RankedElo.Core.csproj", "{BD458FC7-A673-4EB4-A0C7-01C400AFE7D2}"
 EndProject
@@ -9,9 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RankedElo.Core.Tests", "Ran
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{FBF5614D-95F2-42A4-92ED-63A9B9B45AF5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RankedElo.Web", "RankedElo.Web\RankedElo.Web.csproj", "{DBED4D11-1DFF-4F27-A019-0E7E63339B49}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RankedElo.Web", "RankedElo.Web\RankedElo.Web.csproj", "{DBED4D11-1DFF-4F27-A019-0E7E63339B49}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RankedElo.Persistence", "RankedElo.Persistence\RankedElo.Persistence.csproj", "{F157B975-6DC6-4BA4-B786-E413720C8E12}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RankedElo.Persistence", "RankedElo.Persistence\RankedElo.Persistence.csproj", "{F157B975-6DC6-4BA4-B786-E413720C8E12}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RankedElo.Web.Tests", "RankedElo.Web.Tests\RankedElo.Web.Tests.csproj", "{320DEA00-02DF-4F77-9857-F7ED1438BF01}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,12 +37,17 @@ Global
 		{F157B975-6DC6-4BA4-B786-E413720C8E12}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F157B975-6DC6-4BA4-B786-E413720C8E12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F157B975-6DC6-4BA4-B786-E413720C8E12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{320DEA00-02DF-4F77-9857-F7ED1438BF01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{320DEA00-02DF-4F77-9857-F7ED1438BF01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{320DEA00-02DF-4F77-9857-F7ED1438BF01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{320DEA00-02DF-4F77-9857-F7ED1438BF01}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1DA5C086-24AC-456C-BBB4-C9D377151CEB} = {FBF5614D-95F2-42A4-92ED-63A9B9B45AF5}
+		{320DEA00-02DF-4F77-9857-F7ED1438BF01} = {FBF5614D-95F2-42A4-92ED-63A9B9B45AF5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EABFB36F-FC76-49DC-A378-DF3CBB4A2F37}

@@ -15,23 +15,33 @@ namespace RankedElo.Web.Controllers
     {
         private readonly IMatchService _matchService;
         private readonly IPlayerRepository _playerRepository;
+        private readonly ITeamRepository _teamRepository;
 
-        public MatchesController(IMatchService matchService, IPlayerRepository playerRepository)
+        public MatchesController(IMatchService matchService, IPlayerRepository playerRepository, ITeamRepository teamRepository)
         {
             _matchService = matchService ?? throw new ArgumentNullException(nameof(matchService));
             _playerRepository = playerRepository ?? throw new ArgumentNullException(nameof(playerRepository));
+            _teamRepository = teamRepository ?? throw new ArgumentNullException(nameof(teamRepository));
         }
 
         [HttpPost("team")]
-        public async Task<IActionResult> AddMatch(TeamMatch match)
+        public async Task<IActionResult> AddTeamMatch(TwoTeamMatchDto matchDto)
         {
-            // TODO: Dto to simplify client
-            await _matchService.AddMatchAsync<TeamMatch>(match);
-            return Ok();
+            var match = new TeamMatch
+            {
+                StartTime = matchDto.StartTime,
+                EndTime = matchDto.EndTime,
+                Team1Score = matchDto.Team1Score,
+                Team2Score = matchDto.Team2Score,
+                Team1 = await GetOrCreateTeam(matchDto.HomeTeamName),
+                Team2 = await GetOrCreateTeam(matchDto.AwayTeamName)
+            };
+            var result = await _matchService.AddMatchAsync<TeamMatch>(match);
+            return Ok(result);
         }
 
         [HttpPost("soloteam")]
-        public async Task<IActionResult> AddMatch(SoloTeamBaseMatchDto matchDto)
+        public async Task<IActionResult> AddMatch(SoloTeamMatchDto matchDto)
         {
             var playerTasks = matchDto.Players.Select(async x => new SoloTeamPlayer {
                Player = await GetOrCreatePlayer(x.Name),
@@ -52,15 +62,10 @@ namespace RankedElo.Web.Controllers
         }
 
         [HttpPost("twoplayer")]
-        public async Task<IActionResult> AddMatch(TwoPlayerMatchDto matchDto)
+        public async Task<IActionResult> AddTwoPlayerMatch(TwoTeamMatchDto matchDto)
         {
-            // TODO: Fluentvalidation and middleware
-            if(!ModelState.IsValid) 
-            {
-                return BadRequest();
-            }
-            var player1 = await GetOrCreatePlayer(matchDto.Player1Name);
-            var player2 = await GetOrCreatePlayer(matchDto.Player2Name);
+            var player1 = await GetOrCreatePlayer(matchDto.HomeTeamName);
+            var player2 = await GetOrCreatePlayer(matchDto.AwayTeamName);
 
             var match = new TwoPlayerMatch 
             {
@@ -79,6 +84,11 @@ namespace RankedElo.Web.Controllers
         private async Task<Player> GetOrCreatePlayer(string name)
         {
             return await _playerRepository.GetPlayerByNameAsync(name) ?? new Player(name);
+        }
+
+        private async Task<Team> GetOrCreateTeam(string name)
+        {
+            return await _teamRepository.GetTeamByNameAsync(name) ?? new Team(name);
         }
 
     }
