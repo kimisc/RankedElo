@@ -41,6 +41,7 @@ namespace RankedElo.Web.Models
         {
             RuleFor(x => x.AwayTeamName).NotEmpty().MaximumLength(10);
             RuleFor(x => x.HomeTeamName).NotEmpty().MaximumLength(10);
+            RuleFor(x => x.AwayTeamName).NotEqual(x => x.HomeTeamName).WithMessage("Away team name must not be equal to Home team name");
         }
     }
 }

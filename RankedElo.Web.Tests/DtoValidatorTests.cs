@@ -94,5 +94,31 @@ namespace RankedElo.Web.Tests
             var actual = sut.Validate(input);
             Assert.False(actual.IsValid);
         }
+
+
+        [Fact]
+        public void SoloTeamMatchDtoValidator_PlayerNamesMustBeUnique()
+        {
+            var input = new SoloTeamMatchDto()
+            {
+                StartTime = _validStartDate,
+                EndTime = _validEndDate,
+                Team1Score = 0,
+                Team2Score = 1,
+                Players = new List<SoloTeamPlayerDto>() {
+                    new SoloTeamPlayerDto() {
+                        Name = "same",
+                        Team = TeamSide.Away
+                    },
+                    new SoloTeamPlayerDto {
+                        Name = "same",
+                        Team = TeamSide.Home
+                    }
+                }
+            };
+            var sut = new SoloTeamMatchDtoValidator();
+            var actual = sut.Validate(input);
+            Assert.False(actual.IsValid);
+        }
     }
 }
