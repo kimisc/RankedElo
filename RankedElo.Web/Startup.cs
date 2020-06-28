@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using RankedElo.Persistence;
 using RankedElo.Persistence.Repositories;
 using RankedElo.Web.Models;
+using System;
 
 namespace RankedElo.Web
 {
@@ -30,7 +31,7 @@ namespace RankedElo.Web
             services.AddScoped<ITeamRepository, TeamRepository>();
 
             services.AddDbContext<RankedEloDbContext>(options =>
-                options.UseMySql("server=db;database=rankedelo;user=root;password=developer", providerOpt => providerOpt.EnableRetryOnFailure()));
+                options.UseMySql(Environment.GetEnvironmentVariable("RankedEloConnectionString"), providerOpt => providerOpt.EnableRetryOnFailure()));
 
             services.AddControllers()
                 .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<BaseMatchDtoValidator<BaseMatchDto>>());

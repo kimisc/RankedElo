@@ -6,7 +6,11 @@ services:
         image: mysql
         command: --default-authentication-plugin=mysql_native_password
         restart: always
+        # Uncomment for persistence
+        # volumes:
+        #     - data:/var/lib/mysql
         environment:
+            # CHANGE
             MYSQL_ROOT_PASSWORD: developer
 
     adminer:
@@ -27,3 +31,9 @@ services:
         ports: 
             - 8080:80
         restart: always
+        environment:
+            # Update when changing MYSQL_ROOT_PASSWORD
+            RankedEloConnectionString: server=db;database=rankedelo;user=root;password=developer
+# Uncomment for persistence
+# volumes:
+#   data:
