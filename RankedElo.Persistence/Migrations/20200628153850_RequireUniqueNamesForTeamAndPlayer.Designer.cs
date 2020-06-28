@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RankedElo.Persistence;
 
 namespace RankedElo.Persistence.Migrations
 {
     [DbContext(typeof(RankedEloDbContext))]
-    partial class RankedEloDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200628153850_RequireUniqueNamesForTeamAndPlayer")]
+    partial class RequireUniqueNamesForTeamAndPlayer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

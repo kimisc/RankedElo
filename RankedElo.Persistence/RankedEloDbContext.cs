@@ -25,6 +25,14 @@ namespace RankedElo.Persistence
                 .HasValue<SoloTeamMatch>(3);
 
             modelBuilder.Entity<SoloTeamPlayer>().HasKey(sp => new {sp.PlayerId, sp.MatchId});
+
+            modelBuilder.Entity<Player>().Property(x => x.Name)
+            .IsRequired();
+
+            modelBuilder.Entity<Player>().HasIndex(x => x.Name).IsUnique();
+
+            modelBuilder.Entity<Team>().Property(x => x.Name).IsRequired();
+            modelBuilder.Entity<Team>().HasIndex(x => x.Name).IsUnique();
         }
     }
 }
