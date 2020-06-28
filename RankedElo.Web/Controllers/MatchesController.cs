@@ -43,11 +43,14 @@ namespace RankedElo.Web.Controllers
         [HttpPost("soloteam")]
         public async Task<IActionResult> AddMatch(SoloTeamMatchDto matchDto)
         {
-            var playerTasks = matchDto.Players.Select(async x => new SoloTeamPlayer {
-               Player = await GetOrCreatePlayer(x.Name),
-               Team = (TeamSide)x.Team
-            });
-            var soloTeamPlayers = await Task.WhenAll(playerTasks);
+            var soloTeamPlayers = new List<SoloTeamPlayer>();
+            foreach(var playerDto in matchDto.Players) {
+                var player = await GetOrCreatePlayer(playerDto.Name);
+                soloTeamPlayers.Add(new SoloTeamPlayer {
+                    Team = playerDto.Team,
+                    Player = player
+                });
+            }
 
             var match = new SoloTeamMatch()
             {
