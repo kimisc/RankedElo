@@ -30,7 +30,7 @@ namespace RankedElo.Web
             services.AddScoped<ITeamRepository, TeamRepository>();
 
             services.AddDbContext<RankedEloDbContext>(options =>
-                options.UseSqlite("Data Source=rankedElo.db"));
+                options.UseMySql("server=db;database=rankedelo;user=root;password=developer", providerOpt => providerOpt.EnableRetryOnFailure()));
 
             services.AddControllers()
                 .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<BaseMatchDtoValidator<BaseMatchDto>>());
@@ -38,7 +38,7 @@ namespace RankedElo.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, RankedEloDbContext context)
         {
             if (env.IsDevelopment())
             {
@@ -60,6 +60,8 @@ namespace RankedElo.Web
             });
             app.UseRouting();
             app.UseEndpoints(c => c.MapControllers());
+            // Run all migrations on startup for simplicity
+            context.Database.Migrate();
         }
     }
 }

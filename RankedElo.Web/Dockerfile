@@ -1,20 +1,17 @@
-FROM microsoft/dotnet:2.2-aspnetcore-runtime AS base
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build-env
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
 
-FROM microsoft/dotnet:2.2-sdk AS build
-WORKDIR /src
-COPY ["RankedElo.Web/RankedElo.Web.csproj", "RankedElo.Web/"]
-RUN dotnet restore "RankedElo.Web/RankedElo.Web.csproj"
-COPY . .
-WORKDIR "/src/RankedElo.Web"
-RUN dotnet build "RankedElo.Web.csproj" -c Release -o /app
+# Copy csproj and restore as distinct layers
+COPY . ./
+RUN dotnet restore
 
-FROM build AS publish
-RUN dotnet publish "RankedElo.Web.csproj" -c Release -o /app
+# Copy everything else and build
+COPY . ./
+RUN dotnet publish -c Release -o out
 
-FROM base AS final
+# Build runtime image
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
 WORKDIR /app
-COPY --from=publish /app .
+# COPY --from=build-env /app/out .
+COPY --from=build-env /app/out .
 ENTRYPOINT ["dotnet", "RankedElo.Web.dll"]
