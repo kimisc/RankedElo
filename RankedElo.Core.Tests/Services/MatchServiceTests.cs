@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
@@ -9,6 +10,53 @@ using Xunit;
 
 namespace RankedElo.Core.Tests.Services
 {
+    class MatchBuilder<T> where T : Match, new() {
+        private T match;
+
+        public MatchBuilder()
+        {
+            match = new T();
+        }
+
+        public MatchBuilder<T> WithParticipants(string p1name, double p1elo, string p2name, double p2elo) {
+            if (match is TwoPlayerMatch twoPlayerMatch) {
+                twoPlayerMatch.Player1 = CreatePlayer(p1name, p1elo);
+                twoPlayerMatch.Player2 = CreatePlayer(p2name, p2elo);
+            } else if (match is TeamMatch teamMatch) {
+                teamMatch.Team1 = CreateTeam(p1name, p1elo);
+                teamMatch.Team2 = CreateTeam(p2name, p2elo);
+            }else {
+                throw new ArgumentException($"Not a {nameof(TwoPlayerMatch)}");
+            }
+            return this;
+        }
+
+        private Player CreatePlayer(string name, double elo) {
+            return new Player(name) {
+                CurrentElo = elo
+            };
+        } 
+
+        private Team CreateTeam(string name, double elo) {
+            return new Team(name) {
+                CurrentElo = elo
+            };
+        }
+        public MatchBuilder<T> WithWinningTeam(TeamSide team) {
+            if (team == TeamSide.Home) {
+                match.HomeTeamScore = 1;
+                match.AwayTeamScore = 0;
+            } else {
+                match.HomeTeamScore = 0;
+                match.AwayTeamScore = 1;
+            }
+            return this;
+        }
+
+        public T Build() {
+            return match;
+        }
+    }
     public class MatchServiceTests
     {
         private readonly IMatchService _sut;
@@ -60,21 +108,10 @@ namespace RankedElo.Core.Tests.Services
         [Fact]
         public async Task CalculateElo_TwoPlayersTeam1Wins_EloUpdated()
         {
-            IRankedMatch match = new TwoPlayerMatch
-            {
-                Player1 = new Player
-                {
-                    Name = "Player 1",
-                    CurrentElo = 1200
-                },
-                Player2 = new Player
-                {
-                    Name = "Player 2",
-                    CurrentElo = 1000
-                },
-                Team1Score = 1,
-                Team2Score = 0
-            };
+            var match = new MatchBuilder<TwoPlayerMatch>()
+                .WithParticipants("Player 1", 1200, "Player 2", 1000)
+                .WithWinningTeam(TeamSide.Home)
+                .Build();
 
             var result = await _sut.AddMatchAsync<TwoPlayerMatch>(match);
 
@@ -90,21 +127,10 @@ namespace RankedElo.Core.Tests.Services
         [Fact]
         public async Task CalculateElo_TwoPlayersTeam2Wins_EloUpdated()
         {
-            IRankedMatch match = new TwoPlayerMatch
-            {
-                Player1 = new Player
-                {
-                    Name = "Player 1",
-                    CurrentElo = 1200
-                },
-                Player2 = new Player
-                {
-                    Name = "Player 2",
-                    CurrentElo = 1000
-                },
-                Team1Score = 0,
-                Team2Score = 1
-            };
+            var match = new MatchBuilder<TwoPlayerMatch>()
+                .WithParticipants("Player 1", 1200, "Player 2", 1000)
+                .WithWinningTeam(TeamSide.Away)
+                .Build();
 
             var result = await _sut.AddMatchAsync<TwoPlayerMatch>(match);
 
@@ -120,21 +146,10 @@ namespace RankedElo.Core.Tests.Services
         [Fact]
         public async Task CalculateElo_RankedTeamTeam1Wins_EloUpdated()
         {
-            IRankedMatch match = new TeamMatch
-            {
-                Team1 = new Team
-                {
-                    Name = "Team 1",
-                    CurrentElo = 1200
-                },
-                Team2 = new Team
-                {
-                    Name = "Team 2",
-                    CurrentElo = 1000
-                },
-                Team1Score = 1,
-                Team2Score = 0
-            };
+            var match = new MatchBuilder<TeamMatch>()
+                .WithParticipants("Team 1", 1200, "Team 2", 1000)
+                .WithWinningTeam(TeamSide.Home)
+                .Build();
 
             var result = await _sut.AddMatchAsync<TeamMatch>(match);
 
@@ -150,21 +165,10 @@ namespace RankedElo.Core.Tests.Services
         [Fact]
         public async Task CalculateElo_RankedTeamTeam2Wins_EloUpdated()
         {
-            IRankedMatch match = new TeamMatch
-            {
-                Team1 = new Team
-                {
-                    Name = "Team 1",
-                    CurrentElo = 1200
-                },
-                Team2 = new Team
-                {
-                    Name = "Team 2",
-                    CurrentElo = 1000
-                },
-                Team1Score = 0,
-                Team2Score = 1
-            };
+            var match = new MatchBuilder<TeamMatch>()
+                .WithParticipants("Team 1", 1200, "Team 2", 1000)
+                .WithWinningTeam(TeamSide.Away)
+                .Build();
             var result = await _sut.AddMatchAsync<TeamMatch>(match);
 
             var team1 = result.Team1;
@@ -185,8 +189,8 @@ namespace RankedElo.Core.Tests.Services
             IRankedMatch match = new SoloTeamMatch
             {
                 Players = SoloPlayers,
-                Team1Score = team1score,
-                Team2Score = team2score
+                HomeTeamScore = team1score,
+                AwayTeamScore = team2score
             };
 
             var result = await _sut.AddMatchAsync<SoloTeamMatch>(match);
@@ -211,21 +215,10 @@ namespace RankedElo.Core.Tests.Services
         [Fact]
         public async Task CalculateElo_EloChangeBelowZero_ReturnsZero()
         {
-            IRankedMatch match = new TwoPlayerMatch
-            {
-                Player1 = new Player
-                {
-                    Name = "Player 1",
-                    CurrentElo = 0
-                },
-                Player2 = new Player
-                {
-                    Name = "Player 2",
-                    CurrentElo = 1000
-                },
-                Team1Score = 0,
-                Team2Score = 1
-            };
+            var match = new MatchBuilder<TwoPlayerMatch>()
+                .WithParticipants("Player 1", 0, "Player 2", 1000)
+                .WithWinningTeam(TeamSide.Away)
+                .Build();
 
             var result = await _sut.AddMatchAsync<TwoPlayerMatch>(match);
 
@@ -238,21 +231,9 @@ namespace RankedElo.Core.Tests.Services
         [Fact]
         public async Task CalculateElo_TieGameWithSameElo_EloNotChanged()
         {
-            IRankedMatch match = new TwoPlayerMatch
-            {
-                Player1 = new Player
-                {
-                    Name = "Player 1",
-                    CurrentElo = 1000
-                },
-                Player2 = new Player
-                {
-                    Name = "Player 2",
-                    CurrentElo = 1000
-                },
-                Team1Score = 1,
-                Team2Score = 1
-            };
+            var match = new MatchBuilder<TwoPlayerMatch>()
+                .WithParticipants("Player 1", 1000, "Player 2", 1000)
+                .Build();
 
             var result = await _sut.AddMatchAsync<TwoPlayerMatch>(match);
 
@@ -266,22 +247,9 @@ namespace RankedElo.Core.Tests.Services
         [Fact]
         public async Task CalculateElo_TieGameWithDifferentElo_EloChanged()
         {
-            IRankedMatch match = new TwoPlayerMatch
-            {
-                Player1 = new Player
-                {
-                    Name = "Player 1",
-                    CurrentElo = 1000
-                },
-                Player2 = new Player
-                {
-                    Name = "Player 2",
-                    CurrentElo = 1200
-                },
-                Team1Score = 1,
-                Team2Score = 1
-            };
-
+            var match = new MatchBuilder<TwoPlayerMatch>()
+                .WithParticipants("Player 1", 1000, "Player 2", 1200)
+                .Build();
             var result = await _sut.AddMatchAsync<TwoPlayerMatch>(match);
 
             var player1 = result.Player1;

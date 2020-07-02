@@ -31,8 +31,8 @@ namespace RankedElo.Web.Controllers
             {
                 StartTime = matchDto.StartTime,
                 EndTime = matchDto.EndTime,
-                Team1Score = matchDto.Team1Score,
-                Team2Score = matchDto.Team2Score,
+                HomeTeamScore = matchDto.Team1Score,
+                AwayTeamScore = matchDto.Team2Score,
                 Team1 = await GetOrCreateTeam(matchDto.HomeTeamName),
                 Team2 = await GetOrCreateTeam(matchDto.AwayTeamName)
             };
@@ -56,8 +56,8 @@ namespace RankedElo.Web.Controllers
             {
                 EndTime = matchDto.EndTime,
                 StartTime = matchDto.StartTime,
-                Team1Score = matchDto.Team1Score,
-                Team2Score = matchDto.Team2Score,
+                HomeTeamScore = matchDto.Team1Score,
+                AwayTeamScore = matchDto.Team2Score,
                 Players = soloTeamPlayers
             };
             var result = await _matchService.AddMatchAsync<SoloTeamMatch>(match);
@@ -76,8 +76,8 @@ namespace RankedElo.Web.Controllers
                 Player2 = player2,
                 StartTime = matchDto.StartTime,
                 EndTime = matchDto.EndTime,
-                Team1Score = matchDto.Team1Score,
-                Team2Score = matchDto.Team2Score
+                HomeTeamScore = matchDto.Team1Score,
+                AwayTeamScore = matchDto.Team2Score
             };
 
             var result = await _matchService.AddMatchAsync<TwoPlayerMatch>(match);
