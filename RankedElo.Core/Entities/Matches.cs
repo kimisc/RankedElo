@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using RankedElo.Core.Interfaces;
 
 namespace RankedElo.Core.Entities
@@ -13,8 +12,12 @@ namespace RankedElo.Core.Entities
         public DateTime EndTime { get; set; }
         public int HomeTeamScore { get; set; }
         public int AwayTeamScore { get; set; }
-        // TODO: Calculated elo change for match. + for winning team, - for losing team.
-        // public double EloChange { get; set; }
+        public double EloChange { get; set; }
+
+        public void SetEloChange(double oldElo, double newElo)
+        {
+            EloChange = Math.Abs(oldElo - newElo);
+        }
     }
 
     public class TeamMatch : Match, IRankedMatch
@@ -25,6 +28,7 @@ namespace RankedElo.Core.Entities
         public void CalculateElo()
         {
             var (team1Elo, team2Elo) = Elo.CalculateElo(Team1.CurrentElo, Team2.CurrentElo, HomeTeamScore, AwayTeamScore);
+            SetEloChange(Team1.CurrentElo, team1Elo);
             Team1.CurrentElo = team1Elo;
             Team2.CurrentElo = team2Elo;
         }
@@ -38,6 +42,7 @@ namespace RankedElo.Core.Entities
         public void CalculateElo()
         {
             var (team1Elo, team2Elo) = Elo.CalculateElo(Player1.CurrentElo, Player2.CurrentElo, HomeTeamScore, AwayTeamScore);
+            SetEloChange(Player1.CurrentElo, team1Elo);
             Player1.CurrentElo = team1Elo;
             Player2.CurrentElo = team2Elo;
         }
@@ -49,17 +54,21 @@ namespace RankedElo.Core.Entities
 
         public void CalculateElo()
         {
-            var Team1Players = Players.Where(x => x.Team == TeamSide.Home);
-            var Team2Players = Players.Where(x => x.Team == TeamSide.Away);
-            var team1Elo = Team1Players.Average(x => x.Player.CurrentElo);
-            var team2Elo = Team2Players.Average(x => x.Player.CurrentElo);
-            Team1Players.ToList()
-                .ForEach(soloTeamPlayer =>
-                    soloTeamPlayer.Player.CurrentElo = Elo.CalculateElo(team1Elo, team2Elo, HomeTeamScore, AwayTeamScore, soloTeamPlayer.Player.CurrentElo));
-            Team2Players.ToList()
-                .ForEach(player =>
-                    player.Player.CurrentElo = Elo.CalculateElo(team2Elo, team1Elo, AwayTeamScore, HomeTeamScore, player.Player.CurrentElo));
-            Players.ToList().ForEach(x => x.Match = this);
+            var allPlayers = Players.ToList();
+            var homeElo = allPlayers.Where(x => x.Team == TeamSide.Home).Average(x => x.Player.CurrentElo);
+            var awayElo = allPlayers.Where(x => x.Team == TeamSide.Away).Average(x => x.Player.CurrentElo);
+            allPlayers.ForEach(player => UpdatePlayer(player, homeElo, awayElo));
+        }
+
+        private void UpdatePlayer(SoloTeamPlayer soloTeamPlayer, double homeTeamElo, double awayTeamElo)
+        {
+            soloTeamPlayer.Match = this;
+            var newElo = soloTeamPlayer.Team == TeamSide.Home ?
+                Elo.CalculateElo(homeTeamElo, awayTeamElo, HomeTeamScore, AwayTeamScore, soloTeamPlayer.Player.CurrentElo) :
+                Elo.CalculateElo(awayTeamElo, homeTeamElo, AwayTeamScore, HomeTeamScore, soloTeamPlayer.Player.CurrentElo);
+
+            SetEloChange(soloTeamPlayer.Player.CurrentElo, newElo);
+            soloTeamPlayer.Player.CurrentElo = newElo;
         }
     }
 }

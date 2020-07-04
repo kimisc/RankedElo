@@ -18,10 +18,10 @@ namespace RankedElo.Core.Entities
             return (team1Result, team2Result);
         }
 
-        public static double CalculateElo(double team1Elo, double team2Elo, int team1Score, int team2Score, double playerElo)
+        public static double CalculateElo(double homeTeamElo, double awayTeamElo, int homeTeamScore, int awayTeamScore, double playerElo)
         {
-            var team1Probability = CalculateProbability(team2Elo, team1Elo);
-            var team1ActualScore = CalculateActualScore(team1Score, team2Score);
+            var team1Probability = CalculateProbability(awayTeamElo, homeTeamElo);
+            var team1ActualScore = CalculateActualScore(homeTeamScore, awayTeamScore);
             return CalculateEloForSingleParticipant(playerElo, team1Probability, team1ActualScore);
         }
 
