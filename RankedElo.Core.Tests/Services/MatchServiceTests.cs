@@ -10,7 +10,8 @@ using Xunit;
 
 namespace RankedElo.Core.Tests.Services
 {
-    class MatchBuilder<T> where T : Match, new() {
+    class MatchBuilder<T> where T : Match, new()
+    {
         private T match;
 
         public MatchBuilder()
@@ -18,42 +19,57 @@ namespace RankedElo.Core.Tests.Services
             match = new T();
         }
 
-        public MatchBuilder<T> WithParticipants(string p1name, double p1elo, string p2name, double p2elo) {
-            if (match is TwoPlayerMatch twoPlayerMatch) {
+        public MatchBuilder<T> WithParticipants(string p1name, double p1elo, string p2name, double p2elo)
+        {
+            if (match is TwoPlayerMatch twoPlayerMatch)
+            {
                 twoPlayerMatch.Player1 = CreatePlayer(p1name, p1elo);
                 twoPlayerMatch.Player2 = CreatePlayer(p2name, p2elo);
-            } else if (match is TeamMatch teamMatch) {
+            }
+            else if (match is TeamMatch teamMatch)
+            {
                 teamMatch.Team1 = CreateTeam(p1name, p1elo);
                 teamMatch.Team2 = CreateTeam(p2name, p2elo);
-            }else {
+            }
+            else
+            {
                 throw new ArgumentException($"Not a {nameof(TwoPlayerMatch)}");
             }
             return this;
         }
 
-        private Player CreatePlayer(string name, double elo) {
-            return new Player(name) {
-                CurrentElo = elo
-            };
-        } 
-
-        private Team CreateTeam(string name, double elo) {
-            return new Team(name) {
+        private Player CreatePlayer(string name, double elo)
+        {
+            return new Player(name)
+            {
                 CurrentElo = elo
             };
         }
-        public MatchBuilder<T> WithWinningTeam(TeamSide team) {
-            if (team == TeamSide.Home) {
+
+        private Team CreateTeam(string name, double elo)
+        {
+            return new Team(name)
+            {
+                CurrentElo = elo
+            };
+        }
+        public MatchBuilder<T> WithWinningTeam(TeamSide team)
+        {
+            if (team == TeamSide.Home)
+            {
                 match.HomeTeamScore = 1;
                 match.AwayTeamScore = 0;
-            } else {
+            }
+            else
+            {
                 match.HomeTeamScore = 0;
                 match.AwayTeamScore = 1;
             }
             return this;
         }
 
-        public T Build() {
+        public T Build()
+        {
             return match;
         }
     }
@@ -144,6 +160,33 @@ namespace RankedElo.Core.Tests.Services
         }
 
         [Fact]
+        public async Task CalculateElo_TwoPlayerMatch_EloChangeSetCorrectly()
+        {
+
+            var match = CreateGenericMatch<TwoPlayerMatch>();
+            var actual = await _sut.AddMatchAsync<TwoPlayerMatch>((IRankedMatch)match);
+            Assert.Equal(22.8, match.EloChange, 1);
+        }
+
+        [Fact]
+        public async Task CalculateElo_TeamMatch_EloChangeSetCorrectly()
+        {
+
+            var match = CreateGenericMatch<TeamMatch>();
+            var actual = await _sut.AddMatchAsync<TeamMatch>((IRankedMatch)match);
+            Assert.Equal(22.8, match.EloChange, 1);
+        }
+
+        private Match CreateGenericMatch<T>() where T : Match, new()
+        {
+
+            return new MatchBuilder<T>()
+                 .WithParticipants("A", 1200, "B", 1000)
+                 .WithWinningTeam(TeamSide.Away)
+                 .Build();
+        }
+
+        [Fact]
         public async Task CalculateElo_RankedTeamTeam1Wins_EloUpdated()
         {
             var match = new MatchBuilder<TeamMatch>()
@@ -210,6 +253,20 @@ namespace RankedElo.Core.Tests.Services
             Assert.Equal(p3elo, t2_player1.CurrentElo, 1);
             Assert.Equal(p4name, t2_player2.Name);
             Assert.Equal(p4elo, t2_player2.CurrentElo, 1);
+        }
+
+        [Fact]
+        public async Task CalculateElo_SoloTeamMatch_IndividualEloChange()
+        {
+            var match = new SoloTeamMatch
+            {
+                Players = SoloPlayers,
+                HomeTeamScore = 1,
+                AwayTeamScore = 0
+            };
+
+            var result = await _sut.AddMatchAsync<SoloTeamMatch>(match);
+            Assert.All(match.Players, x => Assert.Equal(21.1, x.Match.EloChange, 1));
         }
 
         [Fact]
