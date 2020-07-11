@@ -26,10 +26,17 @@ namespace RankedElo.Web.Models
             RuleFor(x => x.Name).NotEmpty().MaximumLength(10);
             RuleFor(x => x.Name).Must(IsUniqueName).WithMessage("Names must be unique.");
             RuleFor(x => (int)x.Team).InclusiveBetween(1, 2);
+            RuleFor(x => x.Team).Must(_ => IsBothTeamsPlaying()).WithMessage("Must have opposing team");
         }
+
         public bool IsUniqueName(SoloTeamPlayerDto editedPlayer, string newValue)
         {
             return _players.All(player => player.Equals(editedPlayer) || player.Name != newValue);
+        }
+
+        public bool IsBothTeamsPlaying()
+        {
+            return _players.Select(x => x.Team).Distinct().Count() == 2;
         }
     }
     public class SoloTeamMatchDtoValidator : BaseMatchDtoValidator<SoloTeamMatchDto>
